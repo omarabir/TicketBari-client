@@ -67,7 +67,6 @@ const Navbar = ({ theme, toggleTheme }) => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 transition-all duration-300">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo with Gradient */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
@@ -78,25 +77,11 @@ const Navbar = ({ theme, toggleTheme }) => {
             </span>
           </Link>
 
-          {/* Desktop Menu */}
           <ul className="hidden md:flex items-center space-x-1 lg:space-x-2">
             {navLinks}
           </ul>
 
-          {/* Right Side */}
           <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
-            {/* Theme Toggle with Gradient */}
-            <button
-              onClick={toggleTheme}
-              className="relative p-3 rounded-xl bg-gradient-to-r from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-yellow-300 hover:shadow-lg hover:scale-110 transition-all duration-300"
-            >
-              {theme === "light" ? (
-                <FaMoon className="text-lg" />
-              ) : (
-                <FaSun className="text-lg" />
-              )}
-            </button>
-
             {user ? (
               <div className="relative group">
                 <button className="relative">
@@ -108,7 +93,6 @@ const Navbar = ({ theme, toggleTheme }) => {
                   />
                 </button>
 
-                {/* Dropdown */}
                 <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 -translate-y-2">
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 rounded-t-2xl">
                     <div className="flex items-center gap-3">
@@ -165,15 +149,7 @@ const Navbar = ({ theme, toggleTheme }) => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-3">
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-gradient-to-r from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-yellow-300"
-            >
-              {theme === "light" ? <FaMoon /> : <FaSun />}
-            </button>
-
             {user && (
               <div className="relative group">
                 <button className="relative">
@@ -185,7 +161,6 @@ const Navbar = ({ theme, toggleTheme }) => {
                   />
                 </button>
 
-                {/* Mobile Dropdown */}
                 <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 -translate-y-2 z-50">
                   <div className="p-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 rounded-t-2xl">
                     <div className="flex items-center gap-2">
@@ -235,7 +210,6 @@ const Navbar = ({ theme, toggleTheme }) => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden pb-6 space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
             <ul className="space-y-2">{navLinks}</ul>

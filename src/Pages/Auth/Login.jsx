@@ -1,12 +1,15 @@
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { FaGoogle } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { useContext, useState } from "react";
 import toast from "react-hot-toast";
-import { AuthContext } from "../../Providers/AuthProvider";
+import { AuthContext } from "../../providers/AuthProvider";
 
 const Login = () => {
   const { googleSignIn, signIn } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
   const {
     register,
     handleSubmit,
@@ -19,6 +22,7 @@ const Login = () => {
     try {
       await signIn(data.email, data.password);
       toast.success("Login successful!");
+      navigate(from, { replace: true });
     } catch (error) {
       toast.error(error.message || "Login failed");
     } finally {
@@ -31,6 +35,7 @@ const Login = () => {
     try {
       const result = await googleSignIn();
       toast.success("Login successful!");
+      navigate(from, { replace: true });
     } catch (error) {
       toast.error(error.message || "Google sign in failed");
     } finally {
