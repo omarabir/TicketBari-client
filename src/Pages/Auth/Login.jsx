@@ -6,13 +6,25 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../../Providers/AuthProvider";
 
 const Login = () => {
-  const { googleSignIn } = useContext(AuthContext);
+  const { googleSignIn, signIn } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      await signIn(data.email, data.password);
+      toast.success("Login successful!");
+    } catch (error) {
+      toast.error(error.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -32,7 +44,7 @@ const Login = () => {
           Welcome Back
         </h2>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
