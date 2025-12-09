@@ -46,7 +46,7 @@ const Navbar = ({ theme, toggleTheme }) => {
         <>
           <li>
             <NavLink
-              to="/all-tickets"
+              to="/all-ticket"
               className={({ isActive }) =>
                 `px-5 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${
                   isActive
