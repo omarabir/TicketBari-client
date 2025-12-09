@@ -1,11 +1,34 @@
 import { Link } from "react-router";
 import { FaGoogle } from "react-icons/fa";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+
+import toast from "react-hot-toast";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 const Register = () => {
-  const { register, handleSubmit, errors } = useForm();
+  const { createUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      // Create user
+      const result = await createUser(data.email, data.password);
+
+      toast.success("Registration successful!");
+    } catch (error) {
+      toast.error(error.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
@@ -13,7 +36,7 @@ const Register = () => {
           Create Account
         </h2>
 
-        <form onSubmit={handleSubmit(onsubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -110,7 +133,7 @@ const Register = () => {
           type="button"
           className="w-full flex items-center justify-center space-x-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition font-semibold"
         >
-          <FaGoogle className="text-red-500" />
+          <FaGoogle />
           <span>Continue with Google</span>
         </button>
 
