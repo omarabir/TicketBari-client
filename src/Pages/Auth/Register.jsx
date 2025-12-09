@@ -1,7 +1,11 @@
 import { Link } from "react-router";
 import { FaGoogle } from "react-icons/fa";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
 
 const Register = () => {
+  const { register, handleSubmit, errors } = useForm();
+  const [loading, setLoading] = useState(false);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
@@ -9,7 +13,7 @@ const Register = () => {
           Create Account
         </h2>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit(onsubmit)} className="space-y-6">
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -17,9 +21,13 @@ const Register = () => {
             </label>
             <input
               type="text"
+              {...register("name", { required: "Name is required" })}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Enter your name"
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -29,9 +37,15 @@ const Register = () => {
             </label>
             <input
               type="email"
+              {...register("email", { required: "Email is required" })}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Enter your email"
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           {/* Photo URL */}
@@ -41,9 +55,15 @@ const Register = () => {
             </label>
             <input
               type="url"
+              {...register("photoURL", { required: "Photo URL is required" })}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Enter photo URL"
             />
+            {errors.photoURL && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.photoURL.message}
+              </p>
+            )}
           </div>
 
           {/* Password */}
@@ -53,17 +73,26 @@ const Register = () => {
             </label>
             <input
               type="password"
+              {...register("password", {
+                required: "Password is required",
+              })}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Enter your password"
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
           {/* Submit Button */}
           <button
-            type="button"
-            className="w-full bg-primary text-white py-3 rounded-lg hover:bg-blue-600 transition font-semibold"
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary text-white py-3 rounded-lg hover:bg-blue-600 transition font-semibold disabled:opacity-50"
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
