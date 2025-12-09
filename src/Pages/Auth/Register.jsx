@@ -7,8 +7,9 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../Providers/AuthProvider";
 
 const Register = () => {
-  const { createUser } = useContext(AuthContext);
+  const { createUser, googleSignIn } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -18,12 +19,21 @@ const Register = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      // Create user
       const result = await createUser(data.email, data.password);
-
       toast.success("Registration successful!");
     } catch (error) {
       toast.error(error.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const result = await googleSignIn();
+      toast.success("Registration successful!");
+    } catch (error) {
+      toast.error(error.message || "Google sign in failed");
     } finally {
       setLoading(false);
     }
@@ -130,6 +140,7 @@ const Register = () => {
 
         {/* Google Sign In */}
         <button
+          onClick={handleGoogleSignIn}
           type="button"
           className="w-full flex items-center justify-center space-x-2 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition font-semibold"
         >
