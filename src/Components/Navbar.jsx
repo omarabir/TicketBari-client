@@ -1,10 +1,30 @@
-import { useState } from "react";
-
-import { FaBus, FaMoon, FaSun, FaBars, FaTimes } from "react-icons/fa";
+import { useContext, useState } from "react";
 import { Link, NavLink } from "react-router";
+import { AuthContext } from "../providers/AuthProvider";
+import {
+  FaBus,
+  FaMoon,
+  FaSun,
+  FaBars,
+  FaTimes,
+  FaTicketAlt,
+  FaUser,
+} from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const Navbar = ({ theme, toggleTheme }) => {
+  const { user, logOut } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logOut()
+      .then(() => {
+        toast.success("Logged out successfully");
+      })
+      .catch((error) => {
+        toast.error("Logout failed");
+      });
+  };
 
   const navLinks = (
     <>
@@ -12,82 +32,160 @@ const Navbar = ({ theme, toggleTheme }) => {
         <NavLink
           to="/"
           className={({ isActive }) =>
-            `px-4 py-2 rounded-lg transition ${
+            `px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${
               isActive
-                ? "bg-primary text-white"
-                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50"
+                : "text-gray-700 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600"
             }`
           }
         >
           Home
         </NavLink>
       </li>
-
-      <li>
-        <NavLink
-          to="/all-tickets"
-          className={({ isActive }) =>
-            `px-4 py-2 rounded-lg transition ${
-              isActive
-                ? "bg-primary text-white"
-                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-            }`
-          }
-        >
-          All Tickets
-        </NavLink>
-      </li>
+      {user && (
+        <>
+          <li>
+            <NavLink
+              to="/all-tickets"
+              className={({ isActive }) =>
+                `px-5 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${
+                  isActive
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600"
+                }`
+              }
+            >
+              <FaTicketAlt className="text-sm" />
+              All Tickets
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/dashboard/user/profile"
+              className={({ isActive }) =>
+                `px-5 py-2.5 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 ${
+                  isActive
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50"
+                    : "text-gray-700 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600"
+                }`
+              }
+            >
+              <FaUser className="text-sm" />
+              Dashboard
+            </NavLink>
+          </li>
+        </>
+      )}
     </>
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-md">
-      <div className="container mx-auto px-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 transition-all duration-300">
+      <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center space-x-2">
-            <FaBus className="text-3xl text-primary" />
-            <span className="text-2xl font-bold text-gray-800 dark:text-white">
+          {/* Logo with Gradient */}
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
+              <FaBus className="relative text-4xl text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600" />
+            </div>
+            <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               TicketBari
             </span>
           </Link>
 
-          <ul className="hidden md:flex items-center space-x-2">{navLinks}</ul>
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex items-center space-x-1 lg:space-x-2">
+            {navLinks}
+          </ul>
 
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Right Side */}
+          <div className="hidden md:flex items-center space-x-3 lg:space-x-4">
+            {/* Theme Toggle with Gradient */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+              className="relative p-3 rounded-xl bg-gradient-to-r from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-yellow-300 hover:shadow-lg hover:scale-110 transition-all duration-300"
             >
-              {theme === "light" ? <FaMoon /> : <FaSun />}
+              {theme === "light" ? (
+                <FaMoon className="text-lg" />
+              ) : (
+                <FaSun className="text-lg" />
+              )}
             </button>
 
-            <div className="flex space-x-2">
-              <Link
-                to="/login"
-                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="px-6 py-2 bg-secondary text-white rounded-lg hover:bg-purple-600 transition"
-              >
-                Register
-              </Link>
-            </div>
+            {user ? (
+              <div className="relative group">
+                <button className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-300">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur opacity-50"></div>
+                    <img
+                      src={user.photoURL || "https://i.ibb.co/2Pz4LgR/user.png"}
+                      alt={user.displayName}
+                      className="relative w-10 h-10 rounded-full ring-2 ring-blue-500 dark:ring-purple-500 object-cover"
+                    />
+                  </div>
+                  <span className="hidden lg:block font-medium text-gray-700 dark:text-gray-200 max-w-[120px] truncate">
+                    {user.displayName}
+                  </span>
+                </button>
+
+                {/* Dropdown */}
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 -translate-y-2">
+                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {user.displayName}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  <div className="p-2">
+                    <Link
+                      to="/dashboard/user/profile"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200"
+                    >
+                      <FaUser />
+                      My Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200"
+                    >
+                      <FaTimes />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex space-x-3">
+                <Link
+                  to="/login"
+                  className="px-6 py-2.5 rounded-xl font-semibold text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all duration-300"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-6 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg hover:shadow-blue-500/50 hover:scale-105 transition-all duration-300"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Mobile Menu Icon */}
-          <div className="md:hidden flex items-center space-x-2">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center space-x-3">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
+              className="p-2.5 rounded-xl bg-gradient-to-r from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-yellow-300"
             >
               {theme === "light" ? <FaMoon /> : <FaSun />}
             </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-2xl text-gray-700 dark:text-gray-200"
+              className="p-2.5 rounded-xl bg-gradient-to-r from-blue-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 text-xl"
             >
               {isMenuOpen ? <FaTimes /> : <FaBars />}
             </button>
@@ -96,23 +194,48 @@ const Navbar = ({ theme, toggleTheme }) => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden pb-4">
+          <div className="md:hidden pb-6 space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
             <ul className="space-y-2">{navLinks}</ul>
-
-            <div className="mt-4 space-y-2">
-              <Link
-                to="/login"
-                className="block w-full px-4 py-2 bg-primary text-white text-center rounded-lg hover:bg-blue-600 transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="block w-full px-4 py-2 bg-secondary text-white text-center rounded-lg hover:bg-purple-600 transition"
-              >
-                Register
-              </Link>
-            </div>
+            {user ? (
+              <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center space-x-3 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700">
+                  <img
+                    src={user.photoURL || "https://i.ibb.co/2Pz4LgR/user.png"}
+                    alt={user.displayName}
+                    className="w-12 h-12 rounded-full ring-2 ring-blue-500 dark:ring-purple-500 object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 dark:text-white truncate">
+                      {user.displayName}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Link
+                  to="/login"
+                  className="block w-full px-4 py-3 rounded-xl text-center font-semibold text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 transition-all duration-300"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="block w-full px-4 py-3 rounded-xl text-center font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>
