@@ -10,6 +10,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import ErrorPage from "../Pages/ErrorPage";
 import UserProfile from "../Pages/Dashboard/user/UserProfile";
 import MyBookedTickets from "../Pages/Dashboard/user/MyBookedTickets";
+import TransactionHistory from "../Pages/Dashboard/user/TransactionHistory";
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
       {
         path: "user/bookings",
         element: <MyBookedTickets />,
+      },
+      {
+        path: "user/transactions",
+        element: <TransactionHistory />,
       },
     ],
   },
