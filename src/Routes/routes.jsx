@@ -5,6 +5,7 @@ import Login from "../Pages/Auth/Login";
 import Home from "../Pages/Home";
 import PrivateRoute from "./PrivateRoute ";
 import AllTicket from "../Pages/Tickets/AllTicket";
+import TicketDetails from "../Pages/Tickets/TicketDetails";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <AllTicket />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "ticket/:id",
+        element: (
+          <PrivateRoute>
+            <TicketDetails />
           </PrivateRoute>
         ),
       },
