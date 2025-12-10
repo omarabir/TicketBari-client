@@ -62,7 +62,7 @@ const DashboardLayout = () => {
               </NavLink>
 
               <NavLink
-                to="/dashboard/bookings"
+                to="/dashboard/user/bookings"
                 onClick={() => setIsSidebarOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center space-x-3 px-5 py-4 rounded-xl font-medium transition-all duration-300 ${

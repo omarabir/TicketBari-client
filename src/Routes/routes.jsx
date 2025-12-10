@@ -8,7 +8,8 @@ import AllTicket from "../Pages/Tickets/AllTicket";
 import TicketDetails from "../Pages/Tickets/TicketDetails";
 import DashboardLayout from "../layouts/DashboardLayout";
 import ErrorPage from "../Pages/ErrorPage";
-import UserProfile from "../Pages/Dashboard/UserProfile";
+import UserProfile from "../Pages/Dashboard/user/UserProfile";
+import MyBookedTickets from "../Pages/Dashboard/user/MyBookedTickets";
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
       {
         path: "user/profile",
         element: <UserProfile />,
+      },
+      {
+        path: "user/bookings",
+        element: <MyBookedTickets />,
       },
     ],
   },
