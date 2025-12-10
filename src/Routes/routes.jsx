@@ -6,11 +6,15 @@ import Home from "../Pages/Home";
 import PrivateRoute from "./PrivateRoute ";
 import AllTicket from "../Pages/Tickets/AllTicket";
 import TicketDetails from "../Pages/Tickets/TicketDetails";
+import DashboardLayout from "../layouts/DashboardLayout";
+import ErrorPage from "../Pages/ErrorPage";
+import UserProfile from "../Pages/Dashboard/UserProfile";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
@@ -41,5 +45,19 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: "user/profile",
+        element: <UserProfile />,
+      },
+    ],
   },
 ]);
