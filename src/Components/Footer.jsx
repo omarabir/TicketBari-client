@@ -1,7 +1,6 @@
 import { Link } from "react-router";
+import logo from "../assets/logo.png";
 import {
-  FaBus,
-  FaFacebook,
   FaEnvelope,
   FaPhone,
   FaCcVisa,
@@ -11,15 +10,21 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white pt-12 pb-6">
+    <footer className="bg-[#09335b] text-white pt-12 pb-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <FaBus className="text-3xl text-primary" />
-              <span className="text-2xl font-bold">TicketBari</span>
-            </div>
-            <p className="text-gray-400 text-sm">
+            <Link to="/" className="flex items-center space-x-3 group my-2">
+              <img
+                src={logo}
+                alt="TicketBari Logo"
+                className=" w-24 -mt-5 -ml-4"
+              />
+              <span className="text-2xl lg:text-3xl -mb-10 -ml-14 -mt-8 font-bold  bg-clip-text ">
+                TicketBari
+              </span>
+            </Link>
+            <p className="text-gray-100 text-sm">
               Book bus, train, launch & flight tickets easily. Your trusted
               travel companion for all journeys across Bangladesh.
             </p>
@@ -27,7 +32,7 @@ const Footer = () => {
 
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-gray-400 text-sm">
+            <ul className="space-y-2 text-gray-100 text-sm">
               <li>
                 <Link to="/" className="hover:text-primary transition">
                   Home
@@ -56,7 +61,7 @@ const Footer = () => {
 
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
-            <ul className="space-y-3 text-gray-400 text-sm">
+            <ul className="space-y-3 text-gray-100 text-sm">
               <li className="flex items-center space-x-2">
                 <FaEnvelope className="text-primary" />
                 <span>support@ticketbari.com</span>

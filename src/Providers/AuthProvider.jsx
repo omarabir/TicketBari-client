@@ -48,8 +48,28 @@ const AuthProviders = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      
+      if (currentUser) {
+        // Generate JWT token when user is authenticated
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/jwt`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: currentUser.email }),
+          });
+          const data = await response.json();
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+          }
+        } catch (error) {
+          console.error("Error generating token:", error);
+        }
+      } else {
+        localStorage.removeItem("token");
+      }
+      
       setLoading(false);
     });
 

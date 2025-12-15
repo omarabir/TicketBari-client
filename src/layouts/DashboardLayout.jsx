@@ -1,183 +1,229 @@
-import React, { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Link, NavLink, Outlet } from "react-router";
+import axios from "axios";
+import logo from "../assets/logo.png";
 import {
-  FaBars,
-  FaHistory,
-  FaTicketAlt,
   FaUser,
+  FaTicketAlt,
+  FaHistory,
+  FaPlus,
+  FaList,
+  FaChartLine,
+  FaUsers,
+  FaBullhorn,
+  FaBars,
   FaTimes,
   FaHome,
-  FaChartLine,
 } from "react-icons/fa";
-import { Link, NavLink, Outlet } from "react-router";
+import { AuthContext } from "../Providers/AuthProvider";
 
 const DashboardLayout = () => {
+  const { user } = useContext(AuthContext);
+  const [userRole, setUserRole] = useState("user");
+  const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  useEffect(() => {
+    fetchUserRole();
+  }, [user]);
+
+  const fetchUserRole = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/users/${user.email}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserRole(response.data.role || "user");
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const userLinks = [
+    { to: "/dashboard/user/profile", icon: <FaUser />, label: "User Profile" },
+    {
+      to: "/dashboard/user/bookings",
+      icon: <FaTicketAlt />,
+      label: "My Booked Tickets",
+    },
+    {
+      to: "/dashboard/user/transactions",
+      icon: <FaHistory />,
+      label: "Transaction History",
+    },
+  ];
+
+  const vendorLinks = [
+    {
+      to: "/dashboard/vendor/profile",
+      icon: <FaUser />,
+      label: "Vendor Profile",
+    },
+    {
+      to: "/dashboard/vendor/add-ticket",
+      icon: <FaPlus />,
+      label: "Add Ticket",
+    },
+    {
+      to: "/dashboard/vendor/my-tickets",
+      icon: <FaList />,
+      label: "My Added Tickets",
+    },
+    {
+      to: "/dashboard/vendor/bookings",
+      icon: <FaTicketAlt />,
+      label: "Requested Bookings",
+    },
+    {
+      to: "/dashboard/vendor/revenue",
+      icon: <FaChartLine />,
+      label: "Revenue Overview",
+    },
+  ];
+
+  const adminLinks = [
+    {
+      to: "/dashboard/admin/profile",
+      icon: <FaUser />,
+      label: "Admin Profile",
+    },
+    {
+      to: "/dashboard/admin/manage-tickets",
+      icon: <FaList />,
+      label: "Manage Tickets",
+    },
+    {
+      to: "/dashboard/admin/manage-users",
+      icon: <FaUsers />,
+      label: "Manage Users",
+    },
+    {
+      to: "/dashboard/admin/advertise",
+      icon: <FaBullhorn />,
+      label: "Advertise Tickets",
+    },
+  ];
+
+  const getLinks = () => {
+    if (userRole === "admin") return adminLinks;
+    if (userRole === "vendor") return vendorLinks;
+    return userLinks;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="flex">
-        <button
-          onClick={toggleSidebar}
-          className="lg:hidden fixed top-24 left-4 z-50 p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300"
-        >
-          {isSidebarOpen ? <FaTimes /> : <FaBars />}
-        </button>
-
-        <aside
-          className={`fixed lg:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-800 shadow-2xl mt-20 lg:mt-20 transform transition-all duration-500 ease-in-out ${
-            isSidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full lg:translate-x-0"
-          }`}
-        >
-          <div className="h-full overflow-y-auto">
-            <div className="p-6 bg-gradient-to-r from-blue-500 to-purple-600">
-              <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-3">
-                <FaChartLine className="text-3xl" />
-                Dashboard
-              </h2>
-              <p className="text-blue-100 text-sm">
-                Manage your tickets & bookings
-              </p>
-            </div>
-
-            <nav className="p-4 space-y-2">
-              <NavLink
-                to="/dashboard/user/profile"
-                onClick={() => setIsSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 px-5 py-4 rounded-xl font-medium transition-all duration-300 ${
-                    isActive
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50 scale-105"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:scale-105"
-                  }`
-                }
-              >
-                <FaUser className="text-xl" />
-                <span>User Profile</span>
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/user/bookings"
-                onClick={() => setIsSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 px-5 py-4 rounded-xl font-medium transition-all duration-300 ${
-                    isActive
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50 scale-105"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:scale-105"
-                  }`
-                }
-              >
-                <FaTicketAlt className="text-xl" />
-                <span>My Booked Tickets</span>
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/user/transactions"
-                onClick={() => setIsSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 px-5 py-4 rounded-xl font-medium transition-all duration-300 ${
-                    isActive
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50 scale-105"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:scale-105"
-                  }`
-                }
-              >
-                <FaHistory className="text-xl" />
-                <span>Transaction History</span>
-              </NavLink>
-            </nav>
-
-            <div className="p-4 mt-6 border-t border-gray-200 dark:border-gray-700">
-              <Link
-                to="/"
-                onClick={() => setIsSidebarOpen(false)}
-                className="flex items-center justify-center space-x-3 px-5 py-4 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 rounded-xl transition-all duration-300 font-medium hover:scale-105"
-              >
-                <FaHome className="text-xl" />
-                <span>Back to Home</span>
-              </Link>
-            </div>
+    <div>
+      <nav className=" fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+        <div className="container ">
+          <div className="flex items-center h-20">
+            <Link to="/" className="flex items-center">
+              <img src={logo} alt="TicketBari Logo" className="w-24 -mt-5" />
+              <span className="text-2xl lg:text-3xl -mb-10 -ml-10 -mt-8 font-bold text-[#476F97] bg-clip-text">
+                TicketBari
+              </span>
+            </Link>
           </div>
-        </aside>
+        </div>
+      </nav>
+      <div className=" bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="flex">
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="lg:hidden fixed top-24 left-4 z-50 p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300"
+          >
+            {isSidebarOpen ? (
+              <FaTimes className="text-xl" />
+            ) : (
+              <FaBars className="text-xl" />
+            )}
+          </button>
 
-        {isSidebarOpen && (
-          <div
-            onClick={toggleSidebar}
-            className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 mt-20 backdrop-blur-sm transition-all duration-500"
-          />
-        )}
+          <aside
+            className={`fixed lg:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-800 shadow-2xl transform transition-all duration-500 ease-in-out ${
+              isSidebarOpen
+                ? "translate-x-0"
+                : "-translate-x-full lg:translate-x-0"
+            } mt-20 lg:mt-20`}
+          >
+            <div className="h-full overflow-y-auto">
+              <div className="p-6 bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)]">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <FaChartLine className="text-3xl text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+                    <p className="text-blue-100 text-sm capitalize">
+                      {userRole} Panel
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-        <main className="flex-1 p-4 lg:p-8 mt-20 min-h-screen">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-8 rounded-2xl shadow-2xl mb-8 text-white">
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2">
-                Welcome to Your Dashboard! 🎉
-              </h1>
-              <p className="text-blue-100 text-lg">
-                Manage all your tickets and bookings in one place
-              </p>
+              <nav className="p-4 space-y-2">
+                {getLinks().map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 px-5 py-4 rounded-xl font-medium transition-all duration-300 group ${
+                        isActive
+                          ? "bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] text-white shadow-lg shadow-blue-500/50 scale-105"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:scale-105 hover:shadow-md"
+                      }`
+                    }
+                  >
+                    <span
+                      className={`text-xl transition-transform duration-300 group-hover:scale-110`}
+                    >
+                      {link.icon}
+                    </span>
+                    <span>{link.label}</span>
+                  </NavLink>
+                ))}
+              </nav>
+
+              <div className="p-4 mt-6 border-t border-gray-200 dark:border-gray-700">
+                <Link
+                  to="/"
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="flex items-center justify-center space-x-3 px-5 py-4 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 rounded-xl transition-all duration-300 font-medium hover:scale-105 group"
+                >
+                  <FaHome className="text-xl group-hover:scale-110 transition-transform" />
+                  <span>Back to Home</span>
+                </Link>
+              </div>
             </div>
+          </aside>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                      Total Bookings
-                    </p>
-                    <p className="text-3xl font-bold text-gray-800 dark:text-white mt-2">
-                      12
-                    </p>
-                  </div>
-                  <div className="p-4 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 rounded-xl">
-                    <FaTicketAlt className="text-3xl text-blue-600 dark:text-blue-400" />
-                  </div>
-                </div>
-              </div>
+          {isSidebarOpen && (
+            <div
+              className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30 mt-20 transition-all duration-500"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
 
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                      Active Tickets
-                    </p>
-                    <p className="text-3xl font-bold text-gray-800 dark:text-white mt-2">
-                      8
-                    </p>
-                  </div>
-                  <div className="p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 rounded-xl">
-                    <FaChartLine className="text-3xl text-green-600 dark:text-green-400" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                      Total Spent
-                    </p>
-                    <p className="text-3xl font-bold text-gray-800 dark:text-white mt-2">
-                      ৳5,400
-                    </p>
-                  </div>
-                  <div className="p-4 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-xl">
-                    <FaHistory className="text-3xl text-purple-600 dark:text-purple-400" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl">
+          <main className="flex-1 p-4 lg:p-8 mt-20 min-h-screen">
+            <div className="max-w-7xl mx-auto">
               <Outlet />
             </div>
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );

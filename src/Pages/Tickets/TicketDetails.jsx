@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useContext, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import axios from "axios";
 import Countdown from "react-countdown";
+import { Helmet } from "react-helmet-async";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 import {
   FaBus,
@@ -10,19 +12,50 @@ import {
   FaPlane,
   FaMapMarkerAlt,
   FaClock,
+  FaCalendarAlt,
+  FaChair,
+  FaStar,
+  FaUserTie,
+  FaEnvelope,
+  FaTimes,
 } from "react-icons/fa";
+import { IoArrowBack } from "react-icons/io5";
 import toast from "react-hot-toast";
 
 const TicketDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [bookingQuantity, setBookingQuantity] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     fetchTicket();
+    fetchUserRole();
   }, [id]);
+
+  const fetchUserRole = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/users/${user.email}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserRole(response.data.role || "user");
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+      setUserRole("user");
+    }
+  };
 
   const fetchTicket = async () => {
     try {
@@ -38,22 +71,87 @@ const TicketDetails = () => {
     }
   };
 
+  const handleBooking = async (e) => {
+    e.preventDefault();
+
+    if (userRole === "admin") {
+      toast.error("Admin cannot book tickets!");
+      return;
+    }
+
+    if (userRole === "vendor") {
+      toast.error("Vendor cannot book tickets!");
+      return;
+    }
+
+    if (bookingQuantity < 1 || bookingQuantity > ticket.ticketQuantity) {
+      toast.error(`Please enter a valid quantity (1-${ticket.ticketQuantity})`);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const totalPrice = ticket.price * bookingQuantity;
+
+      const bookingData = {
+        ticketId: ticket._id,
+        ticketTitle: ticket.ticketTitle,
+        bookingQuantity,
+        totalPrice,
+        userName: user?.displayName || "Anonymous",
+        userEmail: user?.email,
+      };
+
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/bookings`,
+        bookingData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success("Booking request submitted successfully!");
+      setShowModal(false);
+      navigate("/dashboard/user/bookings");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to book ticket");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const getTransportIcon = (type) => {
+    const iconClass = "text-5xl";
     switch (type?.toLowerCase()) {
       case "bus":
-        return <FaBus className="text-4xl text-primary" />;
+        return <FaBus className={iconClass} />;
       case "train":
-        return <FaTrain className="text-4xl text-primary" />;
+        return <FaTrain className={iconClass} />;
       case "launch":
-        return <FaShip className="text-4xl text-primary" />;
+        return <FaShip className={iconClass} />;
       case "plane":
-        return <FaPlane className="text-4xl text-primary" />;
+        return <FaPlane className={iconClass} />;
       default:
-        return <FaBus className="text-4xl text-primary" />;
+        return <FaBus className={iconClass} />;
+    }
+  };
+
+  const getTransportColor = (type) => {
+    switch (type?.toLowerCase()) {
+      case "bus":
+        return "from-blue-500 to-cyan-500";
+      case "train":
+        return "from-purple-500 to-pink-500";
+      case "launch":
+        return "from-teal-500 to-emerald-500";
+      case "plane":
+        return "from-orange-500 to-red-500";
+      default:
+        return "from-blue-500 to-purple-600";
     }
   };
 
   const isDepartureTimePassed = () => {
+    if (!ticket?.departureDateTime) return false;
     return new Date(ticket.departureDateTime) < new Date();
   };
 
@@ -76,184 +174,383 @@ const TicketDetails = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 my-10">
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-        <img
-          src={ticket.image}
-          alt={ticket.ticketTitle}
-          className="w-full h-96 object-cover"
-        />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4 mt-20">
+      <Helmet>
+        <title>{ticket?.ticketTitle || "Ticket Details"} - TicketBari</title>
+      </Helmet>
 
-        <div className="p-8">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-              {ticket.ticketTitle}
-            </h1>
-            {getTransportIcon(ticket.transportType)}
-          </div>
+      <div className="max-w-7xl mx-auto">
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-gray-700 dark:text-gray-300 hover:scale-105"
+        >
+          <IoArrowBack />
+          <span>Back</span>
+        </button>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 text-gray-700 dark:text-gray-300">
-                <FaMapMarkerAlt className="text-primary text-xl" />
-                <span className="text-lg">
-                  {ticket.fromLocation} → {ticket.toLocation}
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-3 text-gray-700 dark:text-gray-300">
-                <FaClock className="text-primary text-xl" />
-                <span className="text-lg">
-                  {new Date(ticket.departureDateTime).toLocaleString()}
-                </span>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                  Price per ticket
-                </p>
-                <p className="text-4xl font-bold text-primary">
-                  ৳{ticket.price}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                  Available Seats
-                </p>
-                <p className="text-2xl font-semibold text-gray-800 dark:text-white">
-                  {ticket.ticketQuantity}
-                </p>
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500">
+              <div className="relative">
+                <img
+                  src={ticket.image}
+                  alt={ticket.ticketTitle}
+                  className="w-full h-96 object-cover"
+                />
+                <div
+                  className={`absolute top-4 right-4 bg-gradient-to-r ${getTransportColor(
+                    ticket.transportType
+                  )} p-4 rounded-2xl shadow-2xl text-white backdrop-blur-sm bg-opacity-90`}
+                >
+                  {getTransportIcon(ticket.transportType)}
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                  <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+                    {ticket.ticketTitle}
+                  </h1>
+                  <div className="flex items-center gap-2 text-white/90">
+                    <FaStar className="text-yellow-400" />
+                    <span className="text-lg font-semibold">
+                      {ticket.transportType}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  Perks Included
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                <FaMapMarkerAlt className="text-blue-500" />
+                Journey Route
+              </h2>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                    From
+                  </p>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                    {ticket.fromLocation}
+                  </p>
+                </div>
+                <div className="px-6">
+                  <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full relative">
+                    <div className="absolute -right-2 -top-2 w-5 h-5 bg-purple-600 rounded-full"></div>
+                  </div>
+                </div>
+                <div className="flex-1 text-right">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                    To
+                  </p>
+                  <p className="text-2xl font-bold text-gray-800 dark:text-white">
+                    {ticket.toLocation}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                <FaCalendarAlt className="text-purple-500" />
+                Departure Details
+              </h2>
+              <div className="flex items-center gap-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-6 rounded-2xl">
+                <FaClock className="text-4xl text-blue-500" />
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    Departure Time
+                  </p>
+                  <p className="text-xl font-bold text-gray-800 dark:text-white">
+                    {new Date(ticket.departureDateTime).toLocaleString(
+                      "en-US",
+                      {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {!isDepartureTimePassed() && (
+              <div
+                className={`bg-gradient-to-r ${getTransportColor(
+                  ticket.transportType
+                )} rounded-3xl shadow-2xl p-8 text-white hover:scale-105 transition-all duration-300`}
+              >
+                <p className="text-center text-xl font-semibold mb-4">
+                  ⏰ Time Until Departure
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {ticket.perks?.map((perk, index) => (
+                <Countdown
+                  date={new Date(ticket.departureDateTime)}
+                  renderer={({ days, hours, minutes, seconds }) => (
+                    <div className="grid grid-cols-4 gap-4">
+                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                        <p className="text-4xl lg:text-5xl font-bold">{days}</p>
+                        <p className="text-sm mt-2 font-medium">Days</p>
+                      </div>
+                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                        <p className="text-4xl lg:text-5xl font-bold">
+                          {hours}
+                        </p>
+                        <p className="text-sm mt-2 font-medium">Hours</p>
+                      </div>
+                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                        <p className="text-4xl lg:text-5xl font-bold">
+                          {minutes}
+                        </p>
+                        <p className="text-sm mt-2 font-medium">Minutes</p>
+                      </div>
+                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                        <p className="text-4xl lg:text-5xl font-bold">
+                          {seconds}
+                        </p>
+                        <p className="text-sm mt-2 font-medium">Seconds</p>
+                      </div>
+                    </div>
+                  )}
+                />
+              </div>
+            )}
+
+            {ticket.perks && ticket.perks.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                  Included Perks
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {ticket.perks.map((perk, index) => (
                     <span
                       key={index}
-                      className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm"
+                      className="bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 text-blue-800 dark:text-blue-200 px-5 py-3 rounded-xl text-sm font-semibold hover:scale-110 transition-all duration-300 shadow-md"
                     >
                       {perk}
                     </span>
                   ))}
                 </div>
               </div>
+            )}
 
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  Vendor Information
-                </p>
-                <p className="text-gray-700 dark:text-gray-300">
-                  {ticket.vendorName}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {ticket.vendorEmail}
-                </p>
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+                <FaUserTie className="text-green-500" />
+                Vendor Information
+              </h2>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-5 rounded-2xl">
+                  <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white">
+                    <FaUserTie className="text-2xl" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Vendor Name
+                    </p>
+                    <p className="text-lg font-bold text-gray-800 dark:text-white">
+                      {ticket.vendorName}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-5 rounded-2xl">
+                  <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl text-white">
+                    <FaEnvelope className="text-2xl" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Contact Email
+                    </p>
+                    <p className="text-lg font-semibold text-gray-800 dark:text-white">
+                      {ticket.vendorEmail}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {!isDepartureTimePassed() && (
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-xl mb-6">
-              <p className="text-center text-lg mb-2">Time until departure:</p>
-              <Countdown
-                date={new Date(ticket.departureDateTime)}
-                renderer={({ days, hours, minutes, seconds }) => (
-                  <div className="flex justify-center space-x-4 text-center">
-                    <div>
-                      <p className="text-4xl font-bold">{days}</p>
-                      <p className="text-sm">Days</p>
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+              <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 hover:shadow-3xl transition-all duration-300">
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                        Price per ticket
+                      </p>
                     </div>
-                    <div className="text-4xl">:</div>
-                    <div>
-                      <p className="text-4xl font-bold">{hours}</p>
-                      <p className="text-sm">Hours</p>
-                    </div>
-                    <div className="text-4xl">:</div>
-                    <div>
-                      <p className="text-4xl font-bold">{minutes}</p>
-                      <p className="text-sm">Minutes</p>
-                    </div>
-                    <div className="text-4xl">:</div>
-                    <div>
-                      <p className="text-4xl font-bold">{seconds}</p>
-                      <p className="text-sm">Seconds</p>
-                    </div>
+                    <p className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      ৳{ticket.price}
+                    </p>
                   </div>
-                )}
-              />
-            </div>
-          )}
 
-          {/* Book Now Button */}
-          <button
-            onClick={() => setShowModal(true)}
-            disabled={isDepartureTimePassed() || ticket.ticketQuantity === 0}
-            className="w-full bg-primary text-white py-4 rounded-xl text-lg font-semibold hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isDepartureTimePassed()
-              ? "Departure Time Passed"
-              : ticket.ticketQuantity === 0
-              ? "Sold Out"
-              : "Book Now"}
-          </button>
+                  <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-3 mb-3">
+                      <FaChair className="text-3xl text-blue-500" />
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                        Available Seats
+                      </p>
+                    </div>
+                    <p className="text-4xl font-bold text-gray-800 dark:text-white">
+                      {ticket.ticketQuantity}
+                    </p>
+                    {ticket.ticketQuantity < 10 &&
+                      ticket.ticketQuantity > 0 && (
+                        <p className="text-sm text-orange-500 mt-2 font-semibold">
+                          ⚠️ Only {ticket.ticketQuantity} seats left!
+                        </p>
+                      )}
+                  </div>
+
+                  <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+
+                  <button
+                    onClick={() => setShowModal(true)}
+                    disabled={
+                      isDepartureTimePassed() ||
+                      ticket.ticketQuantity === 0 ||
+                      userRole === "admin" ||
+                      userRole === "vendor"
+                    }
+                    className={`w-full py-5 rounded-2xl text-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                      isDepartureTimePassed() ||
+                      ticket.ticketQuantity === 0 ||
+                      userRole === "admin" ||
+                      userRole === "vendor"
+                        ? "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                        : `bg-gradient-to-r ${getTransportColor(
+                            ticket.transportType
+                          )} text-white hover:shadow-2xl`
+                    }`}
+                  >
+                    {userRole === "admin"
+                      ? "🚫 Admin Cannot Book"
+                      : userRole === "vendor"
+                      ? "🚫 Vendor Cannot Book"
+                      : isDepartureTimePassed()
+                      ? "🚫 Departure Time Passed"
+                      : ticket.ticketQuantity === 0
+                      ? "Sold Out"
+                      : "Book Now"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full">
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-              Complete Your Booking
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-md w-full shadow-2xl transform transition-all duration-300 scale-100 hover:scale-105 relative overflow-y-auto max-h-[90vh]">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all"
+            >
+              <FaTimes className="text-gray-500 dark:text-gray-400 text-lg" />
+            </button>
+
+            <h3 className="text-2xl font-bold text-[#09335b]   flex items-center gap-2 mb-4">
+              Complete Booking
             </h3>
-            <form>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Number of Tickets
-                </label>
+
+            <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-xl">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Selected Ticket
+              </p>
+              <p className="text-lg font-bold text-gray-800 dark:text-white">
+                {ticket.ticketTitle}
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {ticket.fromLocation} → {ticket.toLocation}
+              </p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Number of Tickets
+              </label>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setBookingQuantity(Math.max(1, bookingQuantity - 1))
+                  }
+                  className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold"
+                >
+                  -
+                </button>
                 <input
                   type="number"
                   min="1"
                   max={ticket.ticketQuantity}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
-                  required
+                  value={bookingQuantity}
+                  onChange={(e) =>
+                    setBookingQuantity(
+                      Math.min(
+                        ticket.ticketQuantity,
+                        Math.max(1, parseInt(e.target.value) || 1)
+                      )
+                    )
+                  }
+                  className="flex-1 px-3 py-1 text-center border rounded-lg dark:bg-gray-700 dark:text-white"
                 />
-              </div>
-
-              <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                <div className="flex justify-between mb-2">
-                  <span className="text-gray-700 dark:text-gray-300">
-                    Price per ticket:
-                  </span>
-                  <span className="font-semibold">৳{ticket.price}</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold text-primary">
-                  <span>Total Amount:</span>
-                  <span>৳{ticket.price}</span>
-                </div>
-              </div>
-
-              <div className="flex space-x-4">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  onClick={() =>
+                    setBookingQuantity(
+                      Math.min(ticket.ticketQuantity, bookingQuantity + 1)
+                    )
+                  }
+                  className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
-                >
-                  submit Booking
+                  +
                 </button>
               </div>
-            </form>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">
+                Max {ticket.ticketQuantity} tickets available
+              </p>
+            </div>
+
+            <div className="mb-4 p-4 bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] text-white rounded-2xl shadow-inner">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-white/80">Price per ticket:</span>
+                <span className="font-semibold">৳{ticket.price}</span>
+              </div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-white/80">Quantity:</span>
+                <span className="font-semibold">× {bookingQuantity}</span>
+              </div>
+              <div className="h-px bg-white/30 my-2"></div>
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-lg">Total Amount:</span>
+                <span className="text-xl font-bold">
+                  ৳{(ticket.price * bookingQuantity).toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                disabled={submitting}
+                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-xl font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleBooking}
+                disabled={submitting}
+                className="flex-1 px-4 py-2 bg-[#09335b] text-white rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? "Booking..." : "Confirm Booking"}
+              </button>
+            </div>
           </div>
         </div>
       )}

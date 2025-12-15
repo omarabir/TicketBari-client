@@ -1,38 +1,50 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import axios from "axios";
+import { useSearchParams } from "react-router";
+
 import { FaSearch } from "react-icons/fa";
 import TicketCard from "../../Components/TicketCard";
 
 const AllTickets = () => {
+  const [searchParams] = useSearchParams();
   const [tickets, setTickets] = useState([]);
-  const [allTickets, setAllTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState("");
+  const [fromLocation, setFromLocation] = useState("");
+  const [toLocation, setToLocation] = useState("");
   const [transportType, setTransportType] = useState("");
   const [sortBy, setSortBy] = useState("");
-  const limit = 8;
 
-  const fetchAllTickets = async () => {
+  useEffect(() => {
+    setFromLocation(searchParams.get("from") || "");
+    setToLocation(searchParams.get("to") || "");
+    setTransportType(searchParams.get("transportType") || "");
+  }, [searchParams]);
+
+  useEffect(() => {
+    fetchTickets();
+  }, [currentPage, fromLocation, toLocation, transportType, sortBy]);
+
+  const fetchTickets = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/tickets`,
         {
           params: {
-            paginate: false,
-            approvedOnly: false,
-            search,
+            page: currentPage,
+            limit: 9,
+            from: fromLocation,
+            to: toLocation,
             transportType,
             sortBy,
           },
         }
       );
-      console.log(transportType);
-      const list = response.data?.tickets || [];
-      setAllTickets(list);
-      setCurrentPage(1);
+      setTickets(response.data.tickets);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching tickets:", error);
     } finally {
@@ -43,41 +55,53 @@ const AllTickets = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchAllTickets();
+    fetchTickets();
   };
-
-  useEffect(() => {
-    fetchAllTickets();
-  }, [search, transportType, sortBy]);
-
-  useEffect(() => {
-    const start = (currentPage - 1) * limit;
-    const pageSlice = allTickets.slice(start, start + limit);
-    setTickets(pageSlice);
-    setTotalPages(Math.max(1, Math.ceil(allTickets.length / limit)));
-  }, [currentPage, allTickets]);
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Helmet>
+        <title>All Tickets - TicketBari</title>
+      </Helmet>
+
       <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-8 text-center">
         All Available Tickets
       </h1>
 
+      {/* Search and Filter Section */}
       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
         <form
           onSubmit={handleSearch}
           className="grid grid-cols-1 md:grid-cols-4 gap-4"
         >
-          <div className="md:col-span-2">
+          {/* From Location */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Search by Location
+              From
             </label>
             <div className="relative">
               <input
                 type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="From/To location..."
+                value={fromLocation}
+                onChange={(e) => setFromLocation(e.target.value)}
+                placeholder="Departure location..."
+                className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              />
+              <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            </div>
+          </div>
+
+          {/* To Location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              To
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={toLocation}
+                onChange={(e) => setToLocation(e.target.value)}
+                placeholder="Arrival location..."
                 className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
               />
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
@@ -94,7 +118,7 @@ const AllTickets = () => {
                 setTransportType(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#1FA0D6] dark:bg-gray-700 dark:text-white"
             >
               <option value="">All Types</option>
               <option value="Bus">Bus</option>
@@ -114,7 +138,7 @@ const AllTickets = () => {
                 setSortBy(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#1FA0D6] dark:bg-gray-700 dark:text-white"
             >
               <option value="">Default</option>
               <option value="priceLowToHigh">Low to High</option>
@@ -136,12 +160,13 @@ const AllTickets = () => {
             ))}
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-8 gap-2">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition"
+                className="px-4 py-2 bg-[#09335b] text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed  transition"
               >
                 Previous
               </button>
@@ -152,7 +177,7 @@ const AllTickets = () => {
                   onClick={() => setCurrentPage(index + 1)}
                   className={`px-4 py-2 rounded-lg transition ${
                     currentPage === index + 1
-                      ? "bg-primary text-white"
+                      ? "bg-[#09335b] text-white"
                       : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                   }`}
                 >
@@ -165,7 +190,7 @@ const AllTickets = () => {
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition"
+                className="px-4 py-2 bg-[#09335b] text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed  transition"
               >
                 Next
               </button>

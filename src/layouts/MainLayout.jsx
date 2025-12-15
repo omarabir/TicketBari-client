@@ -5,9 +5,11 @@ import { Outlet } from "react-router";
 import Footer from "../Components/Footer";
 
 const MainLayout = () => {
+
+
   return (
     <div>
-      <Navbar />
+      <Navbar  />
       <main>
         <Outlet />
       </main>
