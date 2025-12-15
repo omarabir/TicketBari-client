@@ -2,6 +2,9 @@
 
 A full-stack MERN application for booking travel tickets (Bus, Train, Launch, Plane) with role-based access control for Users, Vendors, and Admins.
 
+## 🌐 Live Links
+
+- **Live Site**: https://ticketbari1.netlify.app/
 
 
 ---
