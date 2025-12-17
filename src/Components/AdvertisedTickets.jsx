@@ -36,10 +36,10 @@ const AdvertisedTickets = () => {
   return (
     <section className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold t mb-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Featured Deals
         </h2>
-        <p className=" max-w-2xl mx-auto">
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
           Don't miss out on these specially selected travel deals handpicked by
           our team
         </p>

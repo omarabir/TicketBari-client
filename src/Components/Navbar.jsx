@@ -57,7 +57,7 @@ const Navbar = () => {
     `px-4 py-2 font-medium transition ${
       isActive
         ? "text-[#1FA0D6] font-semibold"
-        : "text-gray-700 hover:text-[#1FA0D6]"
+        : "text-gray-700 dark:text-gray-200 hover:text-[#1FA0D6]"
     }`;
 
   const navLinks = (
@@ -80,13 +80,13 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur border-b">
+    <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4">
         <div className="h-20 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img src={logo} alt="TicketBari Logo" className="w-24 -mt-5" />
-            <span className="text-2xl lg:text-3xl -mb-10 -ml-10 -mt-8 font-bold text-[#476F97] bg-clip-text">
+            <span className="text-2xl lg:text-3xl -mb-10 -ml-10 -mt-8 font-bold text-[#476F97] dark:text-[#5a9bd5] bg-clip-text">
               TicketBari
             </span>
           </Link>
@@ -108,10 +108,14 @@ const Navbar = () => {
                 </button>
 
                 {isAvatarOpen && (
-                  <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl overflow-hidden">
-                    <div className="p-4 border-b">
-                      <p className="font-semibold">{user.displayName}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                  <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+                    <div className="p-4 border-b dark:border-gray-700">
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {user.displayName}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </p>
                       <span className="inline-block mt-2 px-3 py-1 text-xs bg-[#09335b] text-white rounded-full capitalize">
                         {userRole}
                       </span>
@@ -121,14 +125,14 @@ const Navbar = () => {
                       <Link
                         to={`/dashboard/${userRole}/profile`}
                         onClick={() => setIsAvatarOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
                       >
                         <FaUser /> Dashboard
                       </Link>
 
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 rounded-lg text-red-600 hover:bg-red-50"
+                        className="w-full text-left px-4 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         Logout
                       </button>
@@ -149,30 +153,33 @@ const Navbar = () => {
           {/* Mobile Controls */}
           <div className="md:hidden flex items-center gap-3">
             <ThemeToggle />
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 dark:text-gray-200"
+            >
               {isMenuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden pb-6 pt-4 space-y-4">
+          <div className="md:hidden pb-6 pt-4 space-y-4 bg-white dark:bg-gray-900">
             <div className="flex flex-col gap-2">{navLinks}</div>
 
             {user ? (
-              <div className="pt-4 border-t space-y-4">
-                {/* Avatar Info (same feel as desktop) */}
+              <div className="pt-4 border-t dark:border-gray-700 space-y-4">
                 <div className="flex items-center gap-3 px-4">
                   <img
                     src={user.photoURL || "https://i.ibb.co/2Pz4LgR/user.png"}
                     className="w-12 h-12 rounded-full ring-2 ring-[#09335b]"
                   />
                   <div>
-                    <p className="font-semibold leading-tight">
+                    <p className="font-semibold leading-tight text-gray-900 dark:text-white">
                       {user.displayName}
                     </p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {user.email}
+                    </p>
                     <span className="inline-block mt-1 px-3 py-0.5 text-xs bg-[#09335b] text-white rounded-full capitalize">
                       {userRole}
                     </span>
@@ -183,14 +190,14 @@ const Navbar = () => {
                   <Link
                     to={`/dashboard/${userRole}/profile`}
                     onClick={() => setIsMenuOpen(false)}
-                    className="block px-4 py-2 rounded-lg hover:bg-gray-100"
+                    className="block px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                   >
                     Dashboard
                   </Link>
 
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    className="w-full text-left px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                   >
                     Logout
                   </button>

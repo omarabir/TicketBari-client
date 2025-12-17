@@ -28,7 +28,7 @@ const PopularRoutes = () => {
               <Link
                 key={index}
                 to={`/all-ticket?search=${route.from} ${route.to}&transportType=${route.transport}`}
-                className="flex flex-col items-center p-4 bg-gray-50 dark:bg-black rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-md transition-all"
+                className="flex flex-col items-center p-4 bg-gray-50 dark:bg-[#09335B] rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-md transition-all"
               >
                 <Icon className="text-3xl text-[#1FA0D6]  mb-2" />
                 <p className="text-xs font-semibold text-gray-900 dark:text-white text-center mb-1">

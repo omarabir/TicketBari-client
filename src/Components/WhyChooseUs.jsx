@@ -34,12 +34,12 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="container mx-auto px-4 py-16 ">
+    <section className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold  mb-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Why Choose TicketBari?
         </h2>
-        <p className=" max-w-2xl mx-auto">
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
           We provide the best online ticket booking experience with unmatched
           services
         </p>

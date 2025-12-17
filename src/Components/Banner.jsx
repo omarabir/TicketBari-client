@@ -106,7 +106,7 @@ const Banner = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-4 text-sm md:text-base font-semibold transition-all duration-300 ${
                     activeTab === tab.id
-                      ? "text-[#1FA0D6]  bg-primary/5  border-b-3 border-[#1FA0D6] dark:border-secondary"
+                      ? "text-[#1FA0D6]  bg-primary/5  border-b-3 border-[#1FA0D6] dark:border-[#1FA0D6]"
                       : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 "
                   }`}
                 >
@@ -127,7 +127,7 @@ const Banner = () => {
                     value={from}
                     onChange={(e) => setFrom(e.target.value)}
                     placeholder="Select a city"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[#1FA0D6] focus:border-transparent transition-all"
                   />
                 </div>
 
@@ -135,7 +135,7 @@ const Banner = () => {
                   <button
                     type="button"
                     onClick={handleSwap}
-                    className="p-3 rounded-full bg-[#1FA0D6]/20  text-[#1FA0D6] dark:text-secondary hover:bg-[#1FA0D6]/30 dark:hover:bg-gray-600 transition-all duration-300 hover:scale-110"
+                    className="p-3 rounded-full bg-[#1FA0D6]/20  text-[#1FA0D6] dark:text-[#1FA0D6] hover:bg-[#1FA0D6]/30 dark:hover:bg-gray-600 transition-all duration-300 hover:scale-110"
                   >
                     <FaExchangeAlt className="text-xl" />
                   </button>
@@ -150,7 +150,7 @@ const Banner = () => {
                     value={to}
                     onChange={(e) => setTo(e.target.value)}
                     placeholder="Select a city"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[#1FA0D6] focus:border-transparent transition-all"
                   />
                 </div>
 

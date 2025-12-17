@@ -5,11 +5,9 @@ import { Outlet } from "react-router";
 import Footer from "../Components/Footer";
 
 const MainLayout = () => {
-
-
   return (
-    <div>
-      <Navbar  />
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <Navbar />
       <main>
         <Outlet />
       </main>

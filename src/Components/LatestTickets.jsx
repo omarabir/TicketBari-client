@@ -32,10 +32,12 @@ const LatestTickets = () => {
   }
 
   return (
-    <section className="container mx-auto px-4 py-16  rounded-lg shadow-md">
+    <section className="container mx-auto px-4 py-16 rounded-lg shadow-md">
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold  mb-4">Latest Tickets</h2>
-        <p className=" max-w-2xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          Latest Tickets
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
           Browse our newest ticket offerings for your next adventure
         </p>
       </div>

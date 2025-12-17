@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Tailwind v4: define what `dark:` means for this app.
+  We support both the `dark` class and DaisyUI's `data-theme="dark"`. */
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark, cupcake;
 }
@@ -9,4 +13,3 @@
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
 }
-
