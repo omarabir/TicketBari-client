@@ -80,7 +80,7 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b dark:border-gray-700">
+    <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur  dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4">
         <div className="h-20 flex items-center justify-between">
           {/* Logo */}

@@ -72,27 +72,42 @@ const ManageTickets = () => {
   }
 
   return (
-    <div>
+    <div className=" ">
       <Helmet>
         <title>Manage Tickets - TicketBari</title>
       </Helmet>
 
-      <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-gray-800 dark:text-white">
         Manage Tickets
       </h1>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl ">
+        {/* Scrollable table wrapper */}
         <div className="overflow-x-auto">
-          <table className="table w-full">
+          <table className="">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="p-4 text-left dark:text-gray-300">Ticket</th>
-                <th className="p-4 text-left dark:text-gray-300">Vendor</th>
-                <th className="p-4 text-left dark:text-gray-300">Route</th>
-                <th className="p-4 text-left dark:text-gray-300">Price</th>
-                <th className="p-4 text-left dark:text-gray-300">Quantity</th>
-                <th className="p-4 text-left dark:text-gray-300">Status</th>
-                <th className="p-4 text-center dark:text-gray-300">Actions</th>
+                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
+                  Ticket
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
+                  Vendor
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
+                  Route
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
+                  Price
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
+                  Quantity
+                </th>
+                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
+                  Status
+                </th>
+                <th className="px-2 md:px-4 py-2 text-center dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -101,81 +116,75 @@ const ManageTickets = () => {
                   key={ticket._id}
                   className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                 >
-                  <td className="p-4">
-                    <div className="flex items-center space-x-3">
+                  <td className="px-2 md:px-4 py-2">
+                    <div className="flex items-center space-x-2 md:space-x-3">
                       <img
                         src={ticket.image}
                         alt={ticket.ticketTitle}
-                        className="w-16 h-16 object-cover rounded-lg"
+                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg flex-shrink-0"
                       />
-                      <div>
-                        <p className="font-semibold dark:text-white">
+                      <div className="min-w-0">
+                        <p className="font-semibold dark:text-white text-xs md:text-base truncate max-w-[100px] md:max-w-[200px]">
                           {ticket.ticketTitle}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
                           {ticket.transportType}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-4">
-                    <div>
-                      <p className="font-semibold dark:text-white">
-                        {ticket.vendorName}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {ticket.vendorEmail}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <p className="dark:text-white">
-                      {ticket.fromLocation} → {ticket.toLocation}
+                  <td className="px-2 md:px-4 py-2">
+                    <p className="font-semibold dark:text-white text-xs md:text-base truncate max-w-[100px] md:max-w-none">
+                      {ticket.vendorName}
+                    </p>
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate max-w-[120px] md:max-w-none">
+                      {ticket.vendorEmail}
                     </p>
                   </td>
-                  <td className="p-4">
-                    <p className="font-bold text-primary">৳{ticket.price}</p>
+                  <td className="px-2 md:px-4 py-2 text-xs md:text-base dark:text-white whitespace-nowrap">
+                    {ticket.fromLocation} → {ticket.toLocation}
                   </td>
-                  <td className="p-4">
-                    <p className="font-semibold dark:text-white">
-                      {ticket.ticketQuantity}
-                    </p>
+                  <td className="px-2 md:px-4 py-2 font-bold text-primary text-xs md:text-base whitespace-nowrap">
+                    ৳{ticket.price}
                   </td>
-                  <td className="p-4">
+                  <td className="px-2 md:px-4 py-2 text-xs md:text-base dark:text-white">
+                    {ticket.ticketQuantity}
+                  </td>
+                  <td className="px-2 md:px-4 py-2">
                     <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(
+                      className={`px-2 md:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusBadge(
                         ticket.verificationStatus
                       )}`}
                     >
                       {ticket.verificationStatus}
                     </span>
                   </td>
-                  <td className="p-4">
-                    <div className="flex justify-center space-x-2">
+                  <td className="px-2 md:px-4 py-2">
+                    <div className="flex justify-center space-x-1 md:space-x-2">
                       <button
                         onClick={() => setViewTicket(ticket)}
-                        className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                        className="p-1.5 md:p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
                         title="View Details"
                       >
-                        <FaEye />
+                        <FaEye className="text-xs md:text-base" />
                       </button>
                       {ticket.verificationStatus === "pending" && (
                         <>
                           <button
                             onClick={() => handleApprove(ticket._id)}
                             disabled={verifyMutation.isPending}
-                            className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+                            className="p-1.5 md:p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
                             title="Approve"
                           >
-                            <FaCheckCircle />
+                            <FaCheckCircle className="text-xs md:text-base" />
                           </button>
                           <button
                             onClick={() => handleReject(ticket._id)}
                             disabled={verifyMutation.isPending}
-                            className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
+                            className="p-1.5 md:p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
                             title="Reject"
                           >
-                            <FaTimesCircle />
+                            <FaTimesCircle className="text-xs md:text-base" />
                           </button>
                         </>
                       )}
@@ -188,6 +197,7 @@ const ManageTickets = () => {
         </div>
       </div>
 
+      {/* Ticket Modal */}
       {viewTicket && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">

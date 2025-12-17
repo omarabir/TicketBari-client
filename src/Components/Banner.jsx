@@ -53,19 +53,41 @@ const Banner = () => {
     { id: "flight", label: "Flight", icon: <FaPlane /> },
   ];
 
+  const toTransportTypeParam = (tabId) => {
+    switch ((tabId || "").toLowerCase()) {
+      case "bus":
+        return "Bus";
+      case "train":
+        return "Train";
+      case "launch":
+        return "Launch";
+      case "flight":
+      case "plane":
+        return "Plane";
+      default:
+        return "";
+    }
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
 
     const searchParams = new URLSearchParams();
 
-    searchParams.append("transportType", activeTab);
-
-    if (from) {
-      searchParams.append("from", from);
+    const transportType = toTransportTypeParam(activeTab);
+    if (transportType) {
+      searchParams.append("transportType", transportType);
     }
 
-    if (to) {
-      searchParams.append("to", to);
+    const fromTrimmed = from.trim();
+    const toTrimmed = to.trim();
+
+    if (fromTrimmed) {
+      searchParams.append("from", fromTrimmed);
+    }
+
+    if (toTrimmed) {
+      searchParams.append("to", toTrimmed);
     }
 
     navigate(`/all-ticket?${searchParams.toString()}`);
@@ -165,7 +187,6 @@ const Banner = () => {
                       onChange={(e) => setDate(e.target.value)}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-secondary focus:border-transparent transition-all"
                     />
-                    <FaCalendarAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
               </div>

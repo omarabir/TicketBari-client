@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import axios from "axios";
 import { useSearchParams } from "react-router";
@@ -12,22 +12,33 @@ const AllTickets = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [fromLocation, setFromLocation] = useState("");
-  const [toLocation, setToLocation] = useState("");
-  const [transportType, setTransportType] = useState("");
+  // Initialize from URL so the first fetch uses the intended filters.
+  const [fromLocation, setFromLocation] = useState(
+    () => searchParams.get("from") || ""
+  );
+  const [toLocation, setToLocation] = useState(
+    () => searchParams.get("to") || ""
+  );
+  const [transportType, setTransportType] = useState(
+    () => searchParams.get("transportType") || ""
+  );
   const [sortBy, setSortBy] = useState("");
 
+  const requestSeqRef = useRef(0);
+
   useEffect(() => {
-    setFromLocation(searchParams.get("from") || "");
-    setToLocation(searchParams.get("to") || "");
-    setTransportType(searchParams.get("transportType") || "");
+    const nextFrom = searchParams.get("from") || "";
+    const nextTo = searchParams.get("to") || "";
+    const nextTransport = searchParams.get("transportType") || "";
+
+    setFromLocation(nextFrom);
+    setToLocation(nextTo);
+    setTransportType(nextTransport);
+    setCurrentPage(1);
   }, [searchParams]);
 
-  useEffect(() => {
-    fetchTickets();
-  }, [currentPage, fromLocation, toLocation, transportType, sortBy]);
-
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
+    const requestSeq = ++requestSeqRef.current;
     setLoading(true);
     try {
       const response = await axios.get(
@@ -43,19 +54,27 @@ const AllTickets = () => {
           },
         }
       );
-      setTickets(response.data.tickets);
-      setTotalPages(response.data.totalPages);
+      // Prevent older/slower requests from overwriting newer results.
+      if (requestSeq === requestSeqRef.current) {
+        setTickets(response.data.tickets);
+        setTotalPages(response.data.totalPages);
+      }
     } catch (error) {
       console.error("Error fetching tickets:", error);
     } finally {
-      setLoading(false);
+      if (requestSeq === requestSeqRef.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, [currentPage, fromLocation, toLocation, transportType, sortBy]);
+
+  useEffect(() => {
+    fetchTickets();
+  }, [fetchTickets]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchTickets();
   };
 
   return (

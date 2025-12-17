@@ -126,24 +126,25 @@ const DashboardLayout = () => {
   }
 
   return (
-    <div>
-      <nav className=" fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
-        <div className="container ">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center h-20">
             <Link to="/" className="flex items-center">
               <img src={logo} alt="TicketBari Logo" className="w-24 -mt-5" />
-              <span className="text-2xl lg:text-3xl -mb-10 -ml-10 -mt-8 font-bold text-[#476F97] bg-clip-text">
+              <span className="text-2xl lg:text-3xl -mb-10 -ml-10 -mt-8 font-bold text-[#476F97] dark:text-[#5a9bd5] bg-clip-text">
                 TicketBari
               </span>
             </Link>
           </div>
         </div>
       </nav>
-      <div className=" bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+
+      <div className="pt-20">
         <div className="flex">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="lg:hidden fixed top-24 left-4 z-50 p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300"
+            className="lg:hidden fixed top-24 left-3 z-50 p-3 bg-[#5a9bd5] text-white rounded-xl shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300"
           >
             {isSidebarOpen ? (
               <FaTimes className="text-xl" />
@@ -153,11 +154,11 @@ const DashboardLayout = () => {
           </button>
 
           <aside
-            className={`fixed lg:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-gray-800 shadow-2xl transform transition-all duration-500 ease-in-out ${
+            className={`fixed lg:static top-0 lg:top-auto bottom-0 left-0 z-40 w-[18rem] max-w-[85vw] lg:w-72 bg-white dark:bg-gray-800 shadow-2xl transform transition-all duration-500 ease-in-out ${
               isSidebarOpen
                 ? "translate-x-0"
                 : "-translate-x-full lg:translate-x-0"
-            } mt-20 lg:mt-20`}
+            }`}
           >
             <div className="h-full overflow-y-auto">
               <div className="p-6 bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)]">
@@ -213,13 +214,13 @@ const DashboardLayout = () => {
 
           {isSidebarOpen && (
             <div
-              className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30 mt-20 transition-all duration-500"
+              className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30 transition-all duration-500"
               onClick={() => setIsSidebarOpen(false)}
             />
           )}
 
-          <main className="flex-1 p-4 lg:p-8 mt-20 min-h-screen">
-            <div className="max-w-7xl mx-auto">
+          <main className="flex-1  p-6 lg:p-8">
+            <div className="max-w-5xl ">
               <Outlet />
             </div>
           </main>
