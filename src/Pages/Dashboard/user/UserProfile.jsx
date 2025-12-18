@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { AuthContext } from "../../../Providers/AuthProvider";
 import { FaEnvelope, FaUser, FaIdBadge } from "react-icons/fa";
+import Loader from "../../../Components/Loader";
 
 const UserProfile = () => {
   const { user } = useContext(AuthContext);
@@ -22,11 +23,7 @@ const UserProfile = () => {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

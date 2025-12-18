@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import jsPDF from "jspdf";
 import { FaDownload, FaCreditCard } from "react-icons/fa";
 import { AuthContext } from "../../../Providers/AuthProvider";
+import Loader from "../../../Components/Loader";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_your_key"
@@ -345,11 +346,7 @@ const MyBookedTickets = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -373,7 +370,7 @@ const MyBookedTickets = () => {
           {bookings.map((booking) => (
             <div
               key={booking._id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col"
             >
               <img
                 src={booking.ticketDetails.image}
@@ -381,7 +378,7 @@ const MyBookedTickets = () => {
                 className="w-full h-48 object-cover"
               />
 
-              <div className="p-6">
+              <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-white">
                   {booking.ticketTitle}
                 </h3>
@@ -404,7 +401,7 @@ const MyBookedTickets = () => {
                     <span className="text-gray-600 dark:text-gray-400">
                       Total Price:
                     </span>
-                    <span className="font-bold text-primary text-xl">
+                    <span className="font-bold text-[#209FD7] text-xl">
                       ৳{booking.totalPrice}
                     </span>
                   </div>
@@ -440,7 +437,7 @@ const MyBookedTickets = () => {
                     </div>
                   )}
 
-                <div className="space-y-2">
+                <div className="space-y-2 mt-auto">
                   {booking.status === "accepted" &&
                     new Date(booking.ticketDetails.departureDateTime) >
                       new Date() && (

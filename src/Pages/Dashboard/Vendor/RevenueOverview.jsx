@@ -17,6 +17,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { FaDollarSign, FaTicketAlt, FaChartLine } from "react-icons/fa";
+import Loader from "../../../Components/Loader";
 
 const RevenueOverview = () => {
   const { data: revenueData, isLoading } = useQuery({
@@ -32,11 +33,7 @@ const RevenueOverview = () => {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   const {

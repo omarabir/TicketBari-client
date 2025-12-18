@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TicketCard from "./TicketCard";
+import Loader from "./Loader";
 
 const AdvertisedTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -24,11 +25,7 @@ const AdvertisedTickets = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-16 flex justify-center">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (tickets.length === 0) return null;

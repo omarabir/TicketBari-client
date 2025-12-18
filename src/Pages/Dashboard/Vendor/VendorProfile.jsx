@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { AuthContext } from "../../../Providers/AuthProvider";
 import { FaEnvelope, FaUser, FaIdBadge } from "react-icons/fa";
+import Loader from "../../../Components/Loader";
 
 const VendorProfile = () => {
   const { user } = useContext(AuthContext);
@@ -22,11 +23,7 @@ const VendorProfile = () => {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -62,7 +59,7 @@ const VendorProfile = () => {
           <div className="grid md:grid-cols-2 gap-6 mt-8">
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <div className="flex items-center space-x-3 mb-2">
-                <FaUser className="text-2xl text-primary" />
+                <FaUser className="text-2xl text-[#209FD7]" />
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   Full Name
                 </h3>
@@ -74,7 +71,7 @@ const VendorProfile = () => {
 
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <div className="flex items-center space-x-3 mb-2">
-                <FaEnvelope className="text-2xl text-primary" />
+                <FaEnvelope className="text-2xl text-[#209FD7]" />
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   Email Address
                 </h3>
@@ -86,7 +83,7 @@ const VendorProfile = () => {
 
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <div className="flex items-center space-x-3 mb-2">
-                <FaIdBadge className="text-2xl text-primary" />
+                <FaIdBadge className="text-2xl text-[#209FD7]" />
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   Account Type
                 </h3>
@@ -98,7 +95,7 @@ const VendorProfile = () => {
 
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <div className="flex items-center space-x-3 mb-2">
-                <FaIdBadge className="text-2xl text-primary" />
+                <FaIdBadge className="text-2xl text-[#209FD7]" />
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   Account Status
                 </h3>

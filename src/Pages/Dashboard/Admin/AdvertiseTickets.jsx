@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { FaBullhorn, FaEyeSlash } from "react-icons/fa";
+import Loader from "../../../Components/Loader";
 
 const AdvertiseTickets = () => {
   const queryClient = useQueryClient();
@@ -11,60 +12,49 @@ const AdvertiseTickets = () => {
     queryKey: ["adminApprovedTickets"],
     queryFn: async () => {
       const token = localStorage.getItem("token");
-      const response = await axios.get(
+      const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/admin/tickets`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      return response.data.filter(
-        (ticket) => ticket.verificationStatus === "approved"
-      );
+      return res.data.filter((t) => t.verificationStatus === "approved");
     },
   });
 
   const toggleAdvertiseMutation = useMutation({
     mutationFn: async ({ id, isAdvertised }) => {
       const token = localStorage.getItem("token");
-      const response = await axios.patch(
+      return axios.patch(
         `${import.meta.env.VITE_API_URL}/admin/tickets/${id}/advertise`,
         { isAdvertised },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      return response.data;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, vars) => {
       toast.success(
-        variables.isAdvertised
+        vars.isAdvertised
           ? "Ticket advertised successfully!"
           : "Advertisement removed!"
       );
       queryClient.invalidateQueries(["adminApprovedTickets"]);
     },
-    onError: (error) => {
-      toast.error(
-        error.response?.data?.message || "Failed to update advertisement"
-      );
-    },
   });
 
-  const handleToggleAdvertise = (id, currentStatus) => {
+  const handleToggleAdvertise = (id, current) => {
     const advertisedCount = tickets.filter((t) => t.isAdvertised).length;
-
-    if (!currentStatus && advertisedCount >= 6) {
+    if (!current && advertisedCount >= 6) {
       toast.error("Maximum 6 tickets can be advertised at a time");
       return;
     }
-
-    toggleAdvertiseMutation.mutate({ id, isAdvertised: !currentStatus });
+    toggleAdvertiseMutation.mutate({
+      id,
+      isAdvertised: !current,
+    });
   };
 
   const advertisedTickets = tickets.filter((t) => t.isAdvertised);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -73,63 +63,63 @@ const AdvertiseTickets = () => {
         <title>Advertise Tickets - TicketBari</title>
       </Helmet>
 
-      <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">
+      <h1 className="text-3xl font-bold mb-8 dark:text-white">
         Advertise Tickets
       </h1>
 
+      {/* ===== STATS ===== */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-lg p-6">
-          <p className="text-sm opacity-90 mb-2">Currently Advertised</p>
-          <p className="text-4xl font-bold">{advertisedTickets.length} / 6</p>
-        </div>
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl shadow-lg p-6">
-          <p className="text-sm opacity-90 mb-2">Approved Tickets</p>
-          <p className="text-4xl font-bold">{tickets.length}</p>
-        </div>
-        <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl shadow-lg p-6">
-          <p className="text-sm opacity-90 mb-2">Available Slots</p>
-          <p className="text-4xl font-bold">{6 - advertisedTickets.length}</p>
-        </div>
+        <Stat
+          title="Currently Advertised"
+          value={`${advertisedTickets.length} / 6`}
+          color="from-blue-500 to-blue-600"
+        />
+        <Stat
+          title="Approved Tickets"
+          value={tickets.length}
+          color="from-purple-500 to-purple-600"
+        />
+        <Stat
+          title="Available Slots"
+          value={6 - advertisedTickets.length}
+          color="from-green-500 to-green-600"
+        />
       </div>
 
+      {/* ===== FEATURED ===== */}
       {advertisedTickets.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold mb-4 dark:text-white">
             Currently Advertised Tickets
           </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {advertisedTickets.map((ticket) => (
+            {advertisedTickets.map((t) => (
               <div
-                key={ticket._id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border-2 border-green-500 flex flex-col"
+                key={t._id}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-green-500 overflow-hidden flex flex-col"
               >
                 <div className="relative">
-                  <img
-                    src={ticket.image}
-                    alt={ticket.ticketTitle}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center space-x-1">
-                    <FaBullhorn />
-                    <span>Featured</span>
-                  </div>
+                  <img src={t.image} className="h-48 w-full object-cover" />
+                  <span className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                    <FaBullhorn /> Featured
+                  </span>
                 </div>
+
                 <div className="p-4 flex flex-col flex-grow">
-                  <h3 className="text-lg font-bold dark:text-white mb-2">
-                    {ticket.ticketTitle}
+                  <h3 className="font-bold text-lg dark:text-white mb-1">
+                    {t.ticketTitle}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 flex-grow">
-                    {ticket.fromLocation} → {ticket.toLocation}
+                  <p className="text-sm text-gray-500 mb-4">
+                    {t.fromLocation} → {t.toLocation}
                   </p>
+
                   <button
-                    onClick={() =>
-                      handleToggleAdvertise(ticket._id, ticket.isAdvertised)
-                    }
-                    disabled={toggleAdvertiseMutation.isPending}
-                    className="w-full flex justify-center items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50 mt-auto"
+                    onClick={() => handleToggleAdvertise(t._id, t.isAdvertised)}
+                    className="mt-auto bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg flex justify-center items-center gap-2"
                   >
                     <FaEyeSlash />
-                    <span>Remove Advertisement</span>
+                    Remove Advertisement
                   </button>
                 </div>
               </div>
@@ -138,114 +128,139 @@ const AdvertiseTickets = () => {
         </div>
       )}
 
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-        All Approved Tickets
-      </h2>
+      {/* ===== DESKTOP TABLE ===== */}
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              {["Ticket", "Vendor", "Route", "Price", "Status", "Action"].map(
+                (h) => (
+                  <th
+                    key={h}
+                    className="p-4 text-left text-sm font-semibold dark:text-gray-300"
+                  >
+                    {h}
+                  </th>
+                )
+              )}
+            </tr>
+          </thead>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="p-4 text-left dark:text-gray-300">Ticket</th>
-                <th className="p-4 text-left dark:text-gray-300">Vendor</th>
-                <th className="p-4 text-left dark:text-gray-300">Route</th>
-                <th className="p-4 text-left dark:text-gray-300">Price</th>
-                <th className="p-4 text-left dark:text-gray-300">Status</th>
-                <th className="p-4 text-center dark:text-gray-300">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((ticket) => (
-                <tr
-                  key={ticket._id}
-                  className={`border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
-                    ticket.isAdvertised
-                      ? "bg-green-50 dark:bg-green-900/20"
-                      : ""
-                  }`}
-                >
-                  <td className="p-4">
-                    <div className="flex items-center space-x-3">
-                      <img
-                        src={ticket.image}
-                        alt={ticket.ticketTitle}
-                        className="w-16 h-16 object-cover rounded-lg"
-                      />
-                      <div>
-                        <p className="font-semibold dark:text-white">
-                          {ticket.ticketTitle}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {ticket.transportType}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
+          <tbody>
+            {tickets.map((t) => (
+              <tr
+                key={t._id}
+                className={`border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                  t.isAdvertised ? "bg-green-50 dark:bg-green-900/20" : ""
+                }`}
+              >
+                <td className="p-4 flex gap-3">
+                  <img
+                    src={t.image}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                  <div>
                     <p className="font-semibold dark:text-white">
-                      {ticket.vendorName}
+                      {t.ticketTitle}
                     </p>
-                  </td>
-                  <td className="p-4">
-                    <p className="dark:text-white">
-                      {ticket.fromLocation} → {ticket.toLocation}
-                    </p>
-                  </td>
-                  <td className="p-4">
-                    <p className="font-bold text-primary">৳{ticket.price}</p>
-                  </td>
-                  <td className="p-4">
-                    {ticket.isAdvertised ? (
-                      <span className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-semibold flex items-center space-x-1 w-fit">
-                        <FaBullhorn />
-                        <span>Advertised</span>
-                      </span>
-                    ) : (
-                      <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm">
-                        Not Advertised
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4">
-                    <div className="flex justify-center">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={ticket.isAdvertised || false}
-                          onChange={() =>
-                            handleToggleAdvertise(
-                              ticket._id,
-                              ticket.isAdvertised
-                            )
-                          }
-                          disabled={
-                            toggleAdvertiseMutation.isPending ||
-                            (!ticket.isAdvertised &&
-                              advertisedTickets.length >= 6)
-                          }
-                          className="sr-only peer"
-                        />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
-                      </label>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <p className="text-sm text-gray-500">{t.transportType}</p>
+                  </div>
+                </td>
+
+                <td className="p-4 dark:text-white">{t.vendorName}</td>
+
+                <td className="p-4 dark:text-white">
+                  {t.fromLocation} → {t.toLocation}
+                </td>
+
+                <td className="p-4 font-bold text-primary">৳{t.price}</td>
+
+                <td className="p-4">
+                  {t.isAdvertised ? (
+                    <span className="badge badge-success gap-1">
+                      <FaBullhorn /> Advertised
+                    </span>
+                  ) : (
+                    <span className="text-red-300">Not Advertised</span>
+                  )}
+                </td>
+
+                <td className="p-4 text-center">
+                  <input
+                    type="checkbox"
+                    checked={t.isAdvertised}
+                    onChange={() =>
+                      handleToggleAdvertise(t._id, t.isAdvertised)
+                    }
+                    disabled={!t.isAdvertised && advertisedTickets.length >= 6}
+                    className="toggle toggle-primary"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="md:hidden space-y-4">
+        {tickets.map((t) => (
+          <div
+            key={t._id}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow p-4"
+          >
+            <div className="flex gap-3 mb-3">
+              <img
+                src={t.image}
+                className="w-20 h-20 rounded-lg object-cover"
+              />
+              <div className="min-w-0">
+                <p className="font-bold dark:text-white truncate">
+                  {t.ticketTitle}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {t.fromLocation} → {t.toLocation}
+                </p>
+                <p className="text-sm font-semibold text-primary">৳{t.price}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center mb-3">
+              {t.isAdvertised ? (
+                <span className="badge badge-success gap-1">
+                  <FaBullhorn /> Advertised
+                </span>
+              ) : (
+                <span className="badge">Not Advertised</span>
+              )}
+
+              <input
+                type="checkbox"
+                checked={t.isAdvertised}
+                onChange={() => handleToggleAdvertise(t._id, t.isAdvertised)}
+                disabled={!t.isAdvertised && advertisedTickets.length >= 6}
+                className="toggle toggle-primary"
+              />
+            </div>
+          </div>
+        ))}
       </div>
 
       {tickets.length === 0 && (
-        <div className="text-center py-16">
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            No approved tickets available
-          </p>
-        </div>
+        <p className="text-center py-16 text-gray-500">
+          No approved tickets available
+        </p>
       )}
     </div>
   );
 };
+
+const Stat = ({ title, value, color }) => (
+  <div
+    className={`bg-gradient-to-br ${color} text-white rounded-xl shadow p-6`}
+  >
+    <p className="text-sm opacity-90 mb-2">{title}</p>
+    <p className="text-4xl font-bold">{value}</p>
+  </div>
+);
 
 export default AdvertiseTickets;

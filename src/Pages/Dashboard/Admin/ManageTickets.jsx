@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { FaCheckCircle, FaTimesCircle, FaEye } from "react-icons/fa";
 import { useState } from "react";
+import Loader from "../../../Components/Loader";
 
 const ManageTickets = () => {
   const queryClient = useQueryClient();
@@ -13,191 +14,244 @@ const ManageTickets = () => {
     queryKey: ["adminTickets"],
     queryFn: async () => {
       const token = localStorage.getItem("token");
-      const response = await axios.get(
+      const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/admin/tickets`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      return response.data;
+      return res.data;
     },
   });
 
   const verifyMutation = useMutation({
     mutationFn: async ({ id, verificationStatus }) => {
       const token = localStorage.getItem("token");
-      const response = await axios.patch(
+      return axios.patch(
         `${import.meta.env.VITE_API_URL}/admin/tickets/${id}/verify`,
         { verificationStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      return response.data;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       toast.success(
         `Ticket ${
           variables.verificationStatus === "approved" ? "approved" : "rejected"
-        } successfully!`
+        }`
       );
       queryClient.invalidateQueries(["adminTickets"]);
     },
-    onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to update ticket");
-    },
   });
 
-  const handleApprove = (id) => {
-    verifyMutation.mutate({ id, verificationStatus: "approved" });
-  };
-
-  const handleReject = (id) => {
-    verifyMutation.mutate({ id, verificationStatus: "rejected" });
-  };
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "approved":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "rejected":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      default:
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-    }
+  const badge = (status) => {
+    if (status === "approved")
+      return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200";
+    if (status === "rejected")
+      return "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200";
+    return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200";
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
-    <div className=" ">
+    <div>
       <Helmet>
         <title>Manage Tickets - TicketBari</title>
       </Helmet>
 
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-gray-800 dark:text-white">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 dark:text-white">
         Manage Tickets
       </h1>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl ">
-        {/* Scrollable table wrapper */}
-        <div className="overflow-x-auto">
-          <table className="">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
-                  Ticket
-                </th>
-                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
-                  Vendor
-                </th>
-                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
-                  Route
-                </th>
-                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
-                  Price
-                </th>
-                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
-                  Quantity
-                </th>
-                <th className="px-2 md:px-4 py-2 text-left dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
-                  Status
-                </th>
-                <th className="px-2 md:px-4 py-2 text-center dark:text-gray-300 text-xs md:text-base whitespace-nowrap">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((ticket) => (
-                <tr
-                  key={ticket._id}
-                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-100 dark:bg-gray-700">
+            <tr>
+              {[
+                "Ticket",
+                "Vendor",
+                "Route",
+                "Price",
+                "Qty",
+                "Status",
+                "Actions",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-3 text-left text-sm font-semibold dark:text-gray-300 whitespace-nowrap"
                 >
-                  <td className="px-2 md:px-4 py-2">
-                    <div className="flex items-center space-x-2 md:space-x-3">
-                      <img
-                        src={ticket.image}
-                        alt={ticket.ticketTitle}
-                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg flex-shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <p className="font-semibold dark:text-white text-xs md:text-base truncate max-w-[100px] md:max-w-[200px]">
-                          {ticket.ticketTitle}
-                        </p>
-                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                          {ticket.transportType}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-2 md:px-4 py-2">
-                    <p className="font-semibold dark:text-white text-xs md:text-base truncate max-w-[100px] md:max-w-none">
-                      {ticket.vendorName}
-                    </p>
-                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate max-w-[120px] md:max-w-none">
-                      {ticket.vendorEmail}
-                    </p>
-                  </td>
-                  <td className="px-2 md:px-4 py-2 text-xs md:text-base dark:text-white whitespace-nowrap">
-                    {ticket.fromLocation} → {ticket.toLocation}
-                  </td>
-                  <td className="px-2 md:px-4 py-2 font-bold text-primary text-xs md:text-base whitespace-nowrap">
-                    ৳{ticket.price}
-                  </td>
-                  <td className="px-2 md:px-4 py-2 text-xs md:text-base dark:text-white">
-                    {ticket.ticketQuantity}
-                  </td>
-                  <td className="px-2 md:px-4 py-2">
-                    <span
-                      className={`px-2 md:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusBadge(
-                        ticket.verificationStatus
-                      )}`}
-                    >
-                      {ticket.verificationStatus}
-                    </span>
-                  </td>
-                  <td className="px-2 md:px-4 py-2">
-                    <div className="flex justify-center space-x-1 md:space-x-2">
-                      <button
-                        onClick={() => setViewTicket(ticket)}
-                        className="p-1.5 md:p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                        title="View Details"
-                      >
-                        <FaEye className="text-xs md:text-base" />
-                      </button>
-                      {ticket.verificationStatus === "pending" && (
-                        <>
-                          <button
-                            onClick={() => handleApprove(ticket._id)}
-                            disabled={verifyMutation.isPending}
-                            className="p-1.5 md:p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
-                            title="Approve"
-                          >
-                            <FaCheckCircle className="text-xs md:text-base" />
-                          </button>
-                          <button
-                            onClick={() => handleReject(ticket._id)}
-                            disabled={verifyMutation.isPending}
-                            className="p-1.5 md:p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
-                            title="Reject"
-                          >
-                            <FaTimesCircle className="text-xs md:text-base" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+                  {h}
+                </th>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+
+          <tbody>
+            {tickets.map((t) => (
+              <tr
+                key={t._id}
+                className=" dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+              >
+                <td className="px-4 py-3">
+                  <div className="flex gap-3">
+                    <img
+                      src={t.image}
+                      className="w-14 h-14 rounded-lg object-cover"
+                    />
+                    <div>
+                      <p className="font-semibold dark:text-white">
+                        {t.ticketTitle}
+                      </p>
+                      <p className="text-sm text-gray-500">{t.transportType}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <td className="px-4 py-3">
+                  <p className="font-medium dark:text-white">{t.vendorName}</p>
+                  <p className="text-sm text-gray-500">{t.vendorEmail}</p>
+                </td>
+
+                <td className="px-4 py-3 dark:text-white whitespace-nowrap">
+                  {t.fromLocation} → {t.toLocation}
+                </td>
+
+                <td className="px-4 py-3 font-bold text-primary">৳{t.price}</td>
+                <td className="px-4 py-3 dark:text-white">
+                  {t.ticketQuantity}
+                </td>
+
+                <td className="px-4 py-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${badge(
+                      t.verificationStatus
+                    )}`}
+                  >
+                    {t.verificationStatus}
+                  </span>
+                </td>
+
+                <td className="px-4 py-3">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setViewTicket(t)}
+                      className="btn btn-sm btn-info"
+                    >
+                      <FaEye color="white" />
+                    </button>
+                    {t.verificationStatus === "pending" && (
+                      <>
+                        <button
+                          onClick={() =>
+                            verifyMutation.mutate({
+                              id: t._id,
+                              verificationStatus: "approved",
+                            })
+                          }
+                          className="btn btn-sm btn-success"
+                        >
+                          <FaCheckCircle />
+                        </button>
+                        <button
+                          onClick={() =>
+                            verifyMutation.mutate({
+                              id: t._id,
+                              verificationStatus: "rejected",
+                            })
+                          }
+                          className="btn btn-sm btn-error"
+                        >
+                          <FaTimesCircle />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Ticket Modal */}
+      <div className="md:hidden space-y-4">
+        {tickets.map((t) => (
+          <div
+            key={t._id}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-4"
+          >
+            <div className="flex gap-3 mb-3">
+              <img
+                src={t.image}
+                className="w-16 h-16 rounded-xl object-cover"
+              />
+              <div>
+                <h3 className="font-bold dark:text-white">{t.ticketTitle}</h3>
+                <p className="text-sm text-gray-500">
+                  {t.fromLocation} → {t.toLocation}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-sm space-y-1 mb-3 dark:text-gray-300">
+              <p>
+                <b>Vendor:</b> {t.vendorName}
+              </p>
+              <p>
+                <b>Price:</b> ৳{t.price}
+              </p>
+              <p>
+                <b>Quantity:</b> {t.ticketQuantity}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${badge(
+                  t.verificationStatus
+                )}`}
+              >
+                {t.verificationStatus}
+              </span>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setViewTicket(t)}
+                  className="btn btn-xs btn-info"
+                >
+                  <FaEye />
+                </button>
+                {t.verificationStatus === "pending" && (
+                  <>
+                    <button
+                      onClick={() =>
+                        verifyMutation.mutate({
+                          id: t._id,
+                          verificationStatus: "approved",
+                        })
+                      }
+                      className="btn btn-xs btn-success"
+                    >
+                      <FaCheckCircle />
+                    </button>
+                    <button
+                      onClick={() =>
+                        verifyMutation.mutate({
+                          id: t._id,
+                          verificationStatus: "rejected",
+                        })
+                      }
+                      className="btn btn-xs btn-error"
+                    >
+                      <FaTimesCircle />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {viewTicket && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -255,7 +309,7 @@ const ManageTickets = () => {
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     Price
                   </p>
-                  <p className="font-bold text-primary text-xl">
+                  <p className="font-bold text-[#209FD7] text-xl">
                     ৳{viewTicket.price}
                   </p>
                 </div>

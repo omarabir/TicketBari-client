@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router";
 
 import axios from "axios";
 import { AuthContext } from "../Providers/AuthProvider";
+import Loader from "../Components/Loader";
 
 const RoleBasedRoute = ({ children, allowedRoles }) => {
   const { user, loading: authLoading } = useContext(AuthContext);
@@ -40,11 +41,7 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
   }, [user]);
 
   if (authLoading || loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!user) {
@@ -58,7 +55,12 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
       vendor: "/dashboard/vendor/profile",
       user: "/dashboard/user/profile",
     };
-    return <Navigate to={redirectPaths[userRole] || "/dashboard/user/profile"} replace />;
+    return (
+      <Navigate
+        to={redirectPaths[userRole] || "/dashboard/user/profile"}
+        replace
+      />
+    );
   }
 
   return children;

@@ -1,4 +1,4 @@
-import { FaDAndDBeyond, FaHome } from "react-icons/fa";
+import {  FaHome } from "react-icons/fa";
 import { Link, useRouteError } from "react-router";
 
 const ErrorPage = () => {

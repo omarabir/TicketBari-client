@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router";
 
 import { FaSearch } from "react-icons/fa";
 import TicketCard from "../../Components/TicketCard";
+import Loader from "../../Components/Loader";
 
 const AllTickets = () => {
   const [searchParams] = useSearchParams();
@@ -169,7 +170,7 @@ const AllTickets = () => {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
+          <Loader />
         </div>
       ) : tickets.length > 0 ? (
         <>

@@ -4,6 +4,7 @@ import axios from "axios";
 import Countdown from "react-countdown";
 import { Helmet } from "react-helmet-async";
 import { AuthContext } from "../../Providers/AuthProvider";
+import Loader from "../../Components/Loader";
 
 import {
   FaBus,
@@ -156,11 +157,7 @@ const TicketDetails = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!ticket) {

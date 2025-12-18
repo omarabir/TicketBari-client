@@ -6,9 +6,10 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import logo from "../assets/logo.png";
 import ThemeToggle from "./ThemeToggle";
+import Loader from "./Loader";
 
 const Navbar = () => {
-  const { user, logOut } = useContext(AuthContext);
+  const { user, logOut, loading } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -79,22 +80,27 @@ const Navbar = () => {
     </>
   );
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur  dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4">
         <div className="h-20 flex items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src={logo} alt="TicketBari Logo" className="w-24 -mt-5" />
+            <img
+              src={logo}
+              alt="TicketBari Logo"
+              className="w-24 -mt-5 -ml-4"
+            />
             <span className="text-2xl lg:text-3xl -mb-10 -ml-10 -mt-8 font-bold text-[#476F97] dark:text-[#5a9bd5] bg-clip-text">
               TicketBari
             </span>
           </Link>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-6">{navLinks}</div>
 
-          {/* Desktop Right */}
           <div className="hidden md:flex items-center gap-4">
             <ThemeToggle />
 
