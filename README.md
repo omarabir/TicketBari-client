@@ -310,8 +310,6 @@ Application will run on `http://localhost:5173`
 }
 ```
 
----
-
 ## 🧪 Testing Credentials
 
 ### Test Stripe Card
@@ -341,8 +339,6 @@ Application will run on `http://localhost:5173`
 ```
 /* /index.html 200
 ```
-
----
 
 ## 📝 API Endpoints
 
@@ -381,12 +377,3 @@ Application will run on `http://localhost:5173`
 - `PATCH /admin/tickets/:id/advertise` - Toggle advertisement
 
 ---
-
-## 🤝 Contributing
-
-This is a personal project for educational purposes. Feel free to fork and modify for your learning.
-
----
-
-
-
