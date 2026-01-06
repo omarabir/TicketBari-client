@@ -37,19 +37,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "all-ticket",
-        element: (
-          <PrivateRoute>
-            <AllTicket />
-          </PrivateRoute>
-        ),
+        element: <AllTicket />,
       },
       {
         path: "ticket/:id",
-        element: (
-          <PrivateRoute>
-            <TicketDetails />
-          </PrivateRoute>
-        ),
+        element: <TicketDetails />,
       },
       {
         path: "about",
@@ -81,7 +73,6 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-  
       {
         path: "user/profile",
         element: (

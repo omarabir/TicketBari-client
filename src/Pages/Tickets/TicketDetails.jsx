@@ -406,7 +406,17 @@ const TicketDetails = () => {
                   <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
 
                   <button
-                    onClick={() => setShowModal(true)}
+                    onClick={() => {
+                      if (!user) {
+                        // যদি user logged in না থাকে, তাহলে login page এ redirect করো current location সহ
+                        toast.error("Please login to book tickets");
+                        navigate("/login", {
+                          state: { from: { pathname: `/ticket/${id}` } },
+                        });
+                        return;
+                      }
+                      setShowModal(true);
+                    }}
                     disabled={
                       isDepartureTimePassed() ||
                       ticket.ticketQuantity === 0 ||

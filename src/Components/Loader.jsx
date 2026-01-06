@@ -1,6 +1,6 @@
 const Loader = () => {
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-white dark:bg-gray-900">
+    <div className="flex flex-col justify-center items-center min-h-screen ">
       <div className="relative">
         <div className="flex space-x-2">
           <div className="w-20 h-28 bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700 rounded-lg shadow-xl animate-[bounce_1s_ease-in-out_infinite] relative overflow-hidden">

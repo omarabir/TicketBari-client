@@ -66,11 +66,11 @@ const Navbar = () => {
       <NavLink to="/" className={linkClass}>
         Home
       </NavLink>
-      {user && (
-        <NavLink to="/all-ticket" className={linkClass}>
-          All Tickets
-        </NavLink>
-      )}
+
+      <NavLink to="/all-ticket" className={linkClass}>
+        All Tickets
+      </NavLink>
+
       <NavLink to="/about" className={linkClass}>
         About
       </NavLink>
