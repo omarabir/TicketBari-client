@@ -12,7 +12,8 @@ import {
   FaTimesCircle,
   FaClock,
 } from "react-icons/fa";
-import Loader from "../../../Components/Loader";
+import BookingCardSkeleton from "../../../Components/BookingCardSkeleton";
+
 
 const MyAddedTickets = () => {
   const queryClient = useQueryClient();
@@ -142,10 +143,6 @@ const MyAddedTickets = () => {
     }
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   return (
     <div>
       <Helmet>
@@ -156,7 +153,13 @@ const MyAddedTickets = () => {
         My Added Tickets
       </h1>
 
-      {tickets.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, index) => (
+            <BookingCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : tickets.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-xl text-gray-600 dark:text-gray-400">
             You haven't added any tickets yet

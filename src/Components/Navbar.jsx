@@ -6,10 +6,9 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import logo from "../assets/logo.png";
 import ThemeToggle from "./ThemeToggle";
-import Loader from "./Loader";
 
 const Navbar = () => {
-  const { user, logOut, loading } = useContext(AuthContext);
+  const { user, logOut } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -80,12 +79,8 @@ const Navbar = () => {
     </>
   );
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur  dark:border-gray-700">
+    <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4">
         <div className="h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center">

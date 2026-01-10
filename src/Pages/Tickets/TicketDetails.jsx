@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import axios from "axios";
 import Countdown from "react-countdown";
 import { Helmet } from "react-helmet-async";
+import TicketDetailsSkeleton from "../../Components/TicketDetailsSkeleton";
 import { AuthContext } from "../../Providers/AuthProvider";
-import Loader from "../../Components/Loader";
 
 import {
   FaBus,
@@ -35,12 +35,28 @@ const TicketDetails = () => {
   const [submitting, setSubmitting] = useState(false);
   const [userRole, setUserRole] = useState(null);
 
-  useEffect(() => {
-    fetchTicket();
-    fetchUserRole();
+  const fetchTicket = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/tickets/${id}`
+      );
+      setTicket(response.data);
+    } catch (error) {
+      console.error("Error fetching ticket:", error);
+      console.error("Error details:", error.response?.data);
+      toast.error(
+        error.response?.data?.message || "Failed to load ticket details"
+      );
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
-  const fetchUserRole = async () => {
+  const fetchUserRole = useCallback(async () => {
+    if (!user?.email) {
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
@@ -56,21 +72,12 @@ const TicketDetails = () => {
       console.error("Error fetching user role:", error);
       setUserRole("user");
     }
-  };
+  }, [user]);
 
-  const fetchTicket = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/tickets/${id}`
-      );
-      setTicket(response.data);
-    } catch (error) {
-      console.error("Error fetching ticket:", error);
-      toast.error("Failed to load ticket details");
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchTicket();
+    fetchUserRole();
+  }, [fetchTicket, fetchUserRole]);
 
   const handleBooking = async (e) => {
     e.preventDefault();
@@ -157,7 +164,7 @@ const TicketDetails = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return <TicketDetailsSkeleton />;
   }
 
   if (!ticket) {
@@ -179,7 +186,7 @@ const TicketDetails = () => {
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-gray-700 dark:text-gray-300 hover:scale-105"
+          className="mb-6 flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-gray-700 dark:text-gray-300 hover:scale-105"
         >
           <IoArrowBack />
           <span>Back</span>
@@ -250,7 +257,7 @@ const TicketDetails = () => {
                 <FaCalendarAlt className="text-purple-500" />
                 Departure Details
               </h2>
-              <div className="flex items-center gap-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-6 rounded-2xl">
+              <div className="flex items-center gap-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-6 rounded-xl">
                 <FaClock className="text-4xl text-blue-500" />
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
@@ -277,7 +284,7 @@ const TicketDetails = () => {
               <div
                 className={`bg-gradient-to-r ${getTransportColor(
                   ticket.transportType
-                )} rounded-3xl shadow-2xl p-8 text-white hover:scale-105 transition-all duration-300`}
+                )} rounded-xl shadow-lg p-6 text-white hover:scale-105 transition-all duration-300`}
               >
                 <p className="text-center text-xl font-semibold mb-4">
                   ⏰ Time Until Departure
@@ -286,23 +293,23 @@ const TicketDetails = () => {
                   date={new Date(ticket.departureDateTime)}
                   renderer={({ days, hours, minutes, seconds }) => (
                     <div className="grid grid-cols-4 gap-4">
-                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                      <div className="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center hover:bg-white/30 transition-all">
                         <p className="text-4xl lg:text-5xl font-bold">{days}</p>
                         <p className="text-sm mt-2 font-medium">Days</p>
                       </div>
-                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                      <div className="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center hover:bg-white/30 transition-all">
                         <p className="text-4xl lg:text-5xl font-bold">
                           {hours}
                         </p>
                         <p className="text-sm mt-2 font-medium">Hours</p>
                       </div>
-                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                      <div className="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center hover:bg-white/30 transition-all">
                         <p className="text-4xl lg:text-5xl font-bold">
                           {minutes}
                         </p>
                         <p className="text-sm mt-2 font-medium">Minutes</p>
                       </div>
-                      <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center hover:bg-white/30 transition-all">
+                      <div className="bg-white/20 backdrop-blur-md rounded-xl p-4 text-center hover:bg-white/30 transition-all">
                         <p className="text-4xl lg:text-5xl font-bold">
                           {seconds}
                         </p>
@@ -315,7 +322,7 @@ const TicketDetails = () => {
             )}
 
             {ticket.perks && ticket.perks.length > 0 && (
-              <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
                   Included Perks
                 </h2>
@@ -332,13 +339,13 @@ const TicketDetails = () => {
               </div>
             )}
 
-            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
                 <FaUserTie className="text-green-500" />
                 Vendor Information
               </h2>
               <div className="space-y-4">
-                <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-5 rounded-2xl">
+                <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-5 rounded-xl">
                   <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white">
                     <FaUserTie className="text-2xl" />
                   </div>
@@ -351,7 +358,7 @@ const TicketDetails = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-5 rounded-2xl">
+                <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-5 rounded-xl">
                   <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl text-white">
                     <FaEnvelope className="text-2xl" />
                   </div>
@@ -370,7 +377,7 @@ const TicketDetails = () => {
 
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 hover:shadow-3xl transition-all duration-300">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                 <div className="space-y-6">
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-3 mb-3">
@@ -522,7 +529,7 @@ const TicketDetails = () => {
               </p>
             </div>
 
-            <div className="mb-4 p-4 bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] text-white rounded-2xl shadow-inner">
+            <div className="mb-4 p-4 bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] text-white rounded-xl shadow-inner">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-white/80">Price per ticket:</span>
                 <span className="font-semibold">৳{ticket.price}</span>
@@ -553,9 +560,35 @@ const TicketDetails = () => {
                 type="submit"
                 onClick={handleBooking}
                 disabled={submitting}
-                className="flex-1 px-4 py-2 bg-[#09335b] text-white rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-[#09335b] text-white rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {submitting ? "Booking..." : "Confirm Booking"}
+                {submitting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Booking...</span>
+                  </>
+                ) : (
+                  "Confirm Booking"
+                )}
               </button>
             </div>
           </div>

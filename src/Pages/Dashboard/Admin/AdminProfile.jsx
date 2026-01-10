@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { FaEnvelope, FaUser, FaShieldAlt, FaCrown } from "react-icons/fa";
 import { AuthContext } from "../../../Providers/AuthProvider";
-import Loader from "../../../Components/Loader";
 
 const AdminProfile = () => {
   const { user } = useContext(AuthContext);
@@ -23,7 +22,11 @@ const AdminProfile = () => {
   });
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -36,7 +39,7 @@ const AdminProfile = () => {
         Admin Profile
       </h1>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
         <div className="bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] h-32"></div>
 
         <div className="px-8 pb-8">

@@ -16,10 +16,12 @@ const Contact = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     console.log(data);
     toast.success("Message sent successfully! We'll get back to you soon.");
     reset();
@@ -60,7 +62,6 @@ const Contact = () => {
       </Helmet>
 
       <div className="container mx-auto px-4">
-     
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
             Get in Touch
@@ -72,13 +73,11 @@ const Contact = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-       
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
               Send us a Message
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-             
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Your Name
@@ -155,16 +154,43 @@ const Contact = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[#09335b] hover:bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] text-white py-4 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                disabled={isSubmitting}
+                className="w-full bg-[#09335b] hover:bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] text-white py-4 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Send Message
+                {isSubmitting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  "Send Message"
+                )}
               </button>
             </form>
           </div>
 
           {/* Contact Info */}
           <div className="space-y-8">
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-8">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-xl p-8">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
                 Contact Information
               </h2>
@@ -195,7 +221,7 @@ const Contact = () => {
             </div>
 
             {/* Social Links */}
-            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
               <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
                 Follow Us
               </h3>
@@ -213,7 +239,7 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] rounded-3xl p-8 text-white">
+            <div className="bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] rounded-xl p-8 text-white">
               <h3 className="text-xl font-bold mb-4">Business Hours</h3>
               <div className="space-y-2 opacity-90">
                 <div className="flex justify-between">

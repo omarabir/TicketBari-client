@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { FaBullhorn, FaEyeSlash } from "react-icons/fa";
-import Loader from "../../../Components/Loader";
+import BookingCardSkeleton from "../../../Components/BookingCardSkeleton";
 
 const AdvertiseTickets = () => {
   const queryClient = useQueryClient();
@@ -54,7 +54,13 @@ const AdvertiseTickets = () => {
   const advertisedTickets = tickets.filter((t) => t.isAdvertised);
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, index) => (
+          <BookingCardSkeleton key={index} />
+        ))}
+      </div>
+    );
   }
 
   return (

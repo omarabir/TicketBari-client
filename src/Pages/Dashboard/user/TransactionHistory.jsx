@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import axios from "axios";
-import Loader from "../../../Components/Loader";
 
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
@@ -14,10 +13,12 @@ const TransactionHistory = () => {
   const fetchTransactions = async () => {
     try {
       const token = localStorage.getItem("token");
+      // Fetch user's bookings
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/transactions`,
+        `${import.meta.env.VITE_API_URL}/bookings/user`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      // Show all bookings as transactions (both pending and confirmed)
       setTransactions(res.data);
     } catch (err) {
       console.error(err);
@@ -27,7 +28,11 @@ const TransactionHistory = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -39,10 +44,6 @@ const TransactionHistory = () => {
       <h1 className="text-3xl font-bold mb-6 dark:text-white">
         Transaction History
       </h1>
-
-      {transactions.length === 0 && (
-        <p className="text-center py-16 text-gray-500">No transactions found</p>
-      )}
 
       <div className="hidden md:block bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-x-auto">
         <table className="w-full">
@@ -62,21 +63,28 @@ const TransactionHistory = () => {
               </th>
             </tr>
           </thead>
+          {transactions.length === 0 && (
+            <p className="text-center py-16 text-gray-500 text-center">
+              No transactions found
+            </p>
+          )}
           <tbody>
             {transactions.map((t) => (
               <tr
                 key={t._id}
-                className=" dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
               >
-                <td className="p-4 text-sm dark:text-gray-300">
-                  {t.transactionId}
+                <td className="p-4 text-sm dark:text-gray-300 font-mono">
+                  {t._id.slice(-8)}
                 </td>
                 <td className="p-4 font-medium dark:text-white">
-                  {t.ticketTitle}
+                  {t.ticketTitle || "N/A"}
                 </td>
-                <td className="p-4 font-bold text-[#209FD7]">৳{t.amount}</td>
+                <td className="p-4 font-bold text-[#209FD7]">
+                  ৳{t.price * t.quantity || t.totalPrice || 0}
+                </td>
                 <td className="p-4 text-sm dark:text-gray-300">
-                  {new Date(t.paymentDate).toLocaleDateString()}
+                  {new Date(t.createdAt || t.bookingDate).toLocaleDateString()}
                 </td>
               </tr>
             ))}
@@ -94,25 +102,29 @@ const TransactionHistory = () => {
             <div className="mb-2">
               <p className="text-xs text-gray-500">Transaction ID</p>
               <p className="text-sm font-mono break-all dark:text-gray-300">
-                {t.transactionId}
+                {t._id.slice(-8)}
               </p>
             </div>
 
             <div className="mb-2">
               <p className="text-xs text-gray-500">Ticket</p>
-              <p className="font-semibold dark:text-white">{t.ticketTitle}</p>
+              <p className="font-semibold dark:text-white">
+                {t.ticketTitle || "N/A"}
+              </p>
             </div>
 
             <div className="flex justify-between items-center mt-3">
               <div>
                 <p className="text-xs text-gray-500">Amount</p>
-                <p className="font-bold text-primary">৳{t.amount}</p>
+                <p className="font-bold text-[#209FD7]">
+                  ৳{t.price * t.quantity || t.totalPrice || 0}
+                </p>
               </div>
 
               <div className="text-right">
                 <p className="text-xs text-gray-500">Date</p>
                 <p className="text-sm dark:text-gray-300">
-                  {new Date(t.paymentDate).toLocaleDateString()}
+                  {new Date(t.createdAt || t.bookingDate).toLocaleDateString()}
                 </p>
               </div>
             </div>

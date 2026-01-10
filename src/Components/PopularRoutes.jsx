@@ -77,7 +77,7 @@ const PopularRoutes = () => {
                 aria-label={`View ${transportType || ""} tickets from ${
                   route.from
                 } to ${route.to}`}
-                className="group relative rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 transition hover:shadow-lg"
+                className="group relative rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">

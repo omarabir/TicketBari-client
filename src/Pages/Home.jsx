@@ -1,4 +1,3 @@
-import React from "react";
 import { Helmet } from "react-helmet-async";
 import AdvertisedTickets from "../Components/AdvertisedTickets";
 import LatestTickets from "../Components/LatestTickets";

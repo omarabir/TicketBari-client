@@ -4,7 +4,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { FaCheckCircle, FaTimesCircle, FaEye } from "react-icons/fa";
 import { useState } from "react";
-import Loader from "../../../Components/Loader";
 
 const ManageTickets = () => {
   const queryClient = useQueryClient();
@@ -50,7 +49,11 @@ const ManageTickets = () => {
   };
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (

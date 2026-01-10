@@ -37,7 +37,7 @@ const DownloadApp = () => {
   return (
     <section className="py-16 ">
       <div className="container mx-auto px-4">
-        <div className="bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] rounded-3xl overflow-hidden">
+        <div className="bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] rounded-xl overflow-hidden">
           <div className="grid md:grid-cols-2 gap-8 items-center p-8 md:p-12">
             {/* Left Content */}
             <div className="text-white">

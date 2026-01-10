@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { Link, NavLink, Outlet } from "react-router";
 import axios from "axios";
 import logo from "../assets/logo.png";
@@ -16,19 +16,19 @@ import {
   FaHome,
 } from "react-icons/fa";
 import { AuthContext } from "../Providers/AuthProvider";
-import Loader from "../Components/Loader";
+import { Helmet } from "react-helmet-async";
 
 const DashboardLayout = () => {
   const { user } = useContext(AuthContext);
-  const [userRole, setUserRole] = useState("user");
+  const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    fetchUserRole();
-  }, [user]);
-
-  const fetchUserRole = async () => {
+  const fetchUserRole = useCallback(async () => {
+    if (!user?.email) {
+      setLoading(false);
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
@@ -39,13 +39,18 @@ const DashboardLayout = () => {
           },
         }
       );
-      setUserRole(response.data.role || "user");
+      setUserRole(response.data.role);
     } catch (error) {
       console.error("Error fetching user role:", error);
+      setUserRole("user");
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchUserRole();
+  }, [fetchUserRole]);
 
   const userLinks = [
     { to: "/dashboard/user/profile", icon: <FaUser />, label: "User Profile" },
@@ -119,11 +124,18 @@ const DashboardLayout = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <Helmet>
+        <title>Dashboard - TicketBari</title>
+      </Helmet>
       <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
         <div className="">
           <div className="flex items-center h-20">
@@ -141,7 +153,7 @@ const DashboardLayout = () => {
         <div className="flex">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="lg:hidden fixed top-24 left-3 z-50 p-3 bg-[#5a9bd5] text-white rounded-xl shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300"
+            className="lg:hidden fixed top-24 left-3 z-50 p-3 bg-[#5a9bd5] text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300"
           >
             {isSidebarOpen ? (
               <FaTimes className="text-xl" />

@@ -120,7 +120,7 @@ const Banner = () => {
         </div>
 
         <div ref={cardRef} className="max-w-5xl mx-auto">
-          <div className="bg-white/95 dark:bg-gray-800 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-white/95 dark:bg-gray-800 backdrop-blur-lg rounded-xl shadow-lg overflow-hidden">
             <div className="flex border-b border-gray-200 dark:border-gray-700">
               {tabs.map((tab) => (
                 <button

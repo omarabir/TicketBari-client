@@ -52,7 +52,7 @@ const About = () => {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               <div className="text-4xl text-blue-500 mb-3 flex justify-center">
                 {stat.icon}
@@ -67,7 +67,7 @@ const About = () => {
           ))}
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-8 md:p-12 mb-16">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-xl p-8 md:p-12 mb-16">
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
             Our Story
           </h2>
@@ -101,7 +101,7 @@ const About = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               >
                 <div className="flex justify-center mb-6">{feature.icon}</div>
                 <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
@@ -116,7 +116,7 @@ const About = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] rounded-3xl p-8 text-white">
+          <div className="bg-[linear-gradient(159deg,#377CBD_0%,#09335B_50%,#09335B_100%)] rounded-xl p-8 text-white">
             <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
             <p className="opacity-90">
               To provide a seamless, reliable, and user-friendly platform that
@@ -124,7 +124,7 @@ const About = () => {
               planning effortless and enjoyable for everyone.
             </p>
           </div>
-          <div className="bg-[linear-gradient(159deg,#ABD5FF_0%,#377CBD_50%,#377CBD_100%)] rounded-3xl p-8 text-white">
+          <div className="bg-[linear-gradient(159deg,#ABD5FF_0%,#377CBD_50%,#377CBD_100%)] rounded-xl p-8 text-white">
             <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
             <p className="opacity-90">
               To become the most trusted and preferred travel booking platform

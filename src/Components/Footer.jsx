@@ -18,9 +18,9 @@ const Footer = () => {
               <img
                 src={logo}
                 alt="TicketBari Logo"
-                className=" w-24 -mt-5 -ml-4"
+                className="w-24 -mt-5 -ml-4"
               />
-              <span className="text-2xl lg:text-3xl -mb-10 -ml-14 -mt-8 font-bold  bg-clip-text ">
+              <span className="text-2xl lg:text-3xl -mb-10 -ml-14 -mt-8 font-bold bg-clip-text">
                 TicketBari
               </span>
             </Link>

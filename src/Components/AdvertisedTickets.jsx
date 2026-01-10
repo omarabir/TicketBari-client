@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TicketCard from "./TicketCard";
-import Loader from "./Loader";
+import TicketCardSkeleton from "./TicketCardSkeleton";
 
 const AdvertisedTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -16,6 +16,9 @@ const AdvertisedTickets = () => {
         setTickets(response.data);
       } catch (error) {
         console.error("Error fetching advertised tickets:", error);
+        console.error("Error details:", error.response?.data);
+        // Set empty array so component still renders
+        setTickets([]);
       } finally {
         setLoading(false);
       }
@@ -24,11 +27,7 @@ const AdvertisedTickets = () => {
     fetchTickets();
   }, []);
 
-  if (loading) {
-    return <Loader />;
-  }
-
-  if (tickets.length === 0) return null;
+  if (!loading && tickets.length === 0) return null;
 
   return (
     <section className="container mx-auto px-4 py-16">
@@ -43,9 +42,12 @@ const AdvertisedTickets = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tickets.map((ticket) => (
-          <TicketCard key={ticket._id} ticket={ticket} />
-        ))}
+        {loading
+          ? // Show 6 skeleton cards while loading
+            [...Array(6)].map((_, index) => <TicketCardSkeleton key={index} />)
+          : tickets.map((ticket) => (
+              <TicketCard key={ticket._id} ticket={ticket} />
+            ))}
       </div>
     </section>
   );

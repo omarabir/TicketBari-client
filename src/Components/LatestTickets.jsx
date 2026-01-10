@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TicketCard from "./TicketCard";
-import Loader from "./Loader";
+import TicketCardSkeleton from "./TicketCardSkeleton";
 
 const LatestTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -16,6 +16,9 @@ const LatestTickets = () => {
         setTickets(response.data);
       } catch (error) {
         console.error("Error fetching latest tickets:", error);
+        console.error("Error details:", error.response?.data);
+        // Set empty array so component still renders
+        setTickets([]);
       } finally {
         setLoading(false);
       }
@@ -24,12 +27,8 @@ const LatestTickets = () => {
     fetchTickets();
   }, []);
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
-    <section className="container mx-auto px-4 py-16 rounded-lg shadow-md">
+    <section className="container mx-auto px-4 py-16 ">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Latest Tickets
@@ -40,9 +39,12 @@ const LatestTickets = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {tickets.map((ticket) => (
-          <TicketCard key={ticket._id} ticket={ticket} />
-        ))}
+        {loading
+          ? // Show 8 skeleton cards while loading
+            [...Array(8)].map((_, index) => <TicketCardSkeleton key={index} />)
+          : tickets.map((ticket) => (
+              <TicketCard key={ticket._id} ticket={ticket} />
+            ))}
       </div>
     </section>
   );

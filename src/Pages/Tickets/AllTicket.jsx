@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router";
 
 import { FaSearch } from "react-icons/fa";
 import TicketCard from "../../Components/TicketCard";
-import Loader from "../../Components/Loader";
+import TicketCardSkeleton from "../../Components/TicketCardSkeleton";
 
 const AllTickets = () => {
   const [searchParams] = useSearchParams();
@@ -169,8 +169,11 @@ const AllTickets = () => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Loader />
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {/* Show 12 skeleton cards while loading */}
+          {[...Array(12)].map((_, index) => (
+            <TicketCardSkeleton key={index} />
+          ))}
         </div>
       ) : tickets.length > 0 ? (
         <>

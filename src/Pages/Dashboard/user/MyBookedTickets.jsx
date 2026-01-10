@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 import jsPDF from "jspdf";
 import { FaDownload, FaCreditCard } from "react-icons/fa";
 import { AuthContext } from "../../../Providers/AuthProvider";
-import Loader from "../../../Components/Loader";
+import BookingCardSkeleton from "../../../Components/BookingCardSkeleton";
 
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_your_key"
@@ -140,7 +140,6 @@ const CheckoutForm = ({ booking, onSuccess, onCancel }) => {
 };
 
 const MyBookedTickets = () => {
-  const { user } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const [paymentBooking, setPaymentBooking] = useState(null);
 
@@ -316,8 +315,11 @@ const MyBookedTickets = () => {
     doc.setFontSize(8);
     doc.text("Scan at boarding:", 105, 260, { align: "center" });
     doc.setFillColor(0, 0, 0);
+    const barcodePattern = Array.from({ length: 40 }, () =>
+      Math.random() > 0.5 ? 8 : 4
+    );
     for (let i = 0; i < 40; i++) {
-      const height = Math.random() > 0.5 ? 8 : 4;
+      const height = barcodePattern[i];
       doc.rect(60 + i * 2.5, 265, 2, height, "F");
     }
 
@@ -345,10 +347,6 @@ const MyBookedTickets = () => {
     }
   };
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   return (
     <div>
       <Helmet>
@@ -359,7 +357,13 @@ const MyBookedTickets = () => {
         My Booked Tickets
       </h1>
 
-      {bookings.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, index) => (
+            <BookingCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : bookings.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-xl text-gray-600 dark:text-gray-400">
             You haven't booked any tickets yet
